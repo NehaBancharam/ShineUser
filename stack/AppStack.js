@@ -1,24 +1,21 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import ProfileStack from "./ProfileStack";
 import Home from "../screens/Home";
 import Feed from "../screens/Feed";
+import { createStackNavigator } from "@react-navigation/stack";
 import Post from "../screens/Post";
 
-const Tab = createBottomTabNavigator();
+// const Tab = createBottomTabNavigator();
+const Tab = createMaterialBottomTabNavigator();
 
-const tabBarOptions = {
-  showLabel: true,
-  labelStyle:{
-    color:"#E4D7F1",
-    
-  },
-  style: {
-    backgroundColor: "#ffffff",
-    padding: 5,
-  },
+const Stack = createStackNavigator();
+
+const barStyle = {
+  backgroundColor: "white",
 };
 
 const screenOptions = ({ route }) => ({
@@ -48,20 +45,33 @@ const screenOptions = ({ route }) => ({
     return (
       <MaterialIcons
         name={iconName}
-        size={33}
+        size={24}
         color={focused ? "#634C87" : "#D3D3D3"}
-        
       />
     );
   },
 });
 
+const FeedStack = () => (
+  <Stack.Navigator>
+    <Stack.Screen
+      name="ViewFeed"
+      component={Feed}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="Post"
+      component={Post}
+      options={{ headerShown: false }}
+    />
+  </Stack.Navigator>
+);
+
 export default BottomTabNavigator = () => {
   return (
-    <Tab.Navigator tabBarOptions={tabBarOptions} screenOptions={screenOptions}>
+    <Tab.Navigator screenOptions={screenOptions} barStyle={barStyle} shifting>
       <Tab.Screen name="Home" component={Home} />
-      <Tab.Screen name="Post" component={Post} />
-      <Tab.Screen name="Feed" component={Feed} options={{tabBarBadge: 2}} />
+      <Tab.Screen name="Feed" component={FeedStack} />
       <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>
   );
