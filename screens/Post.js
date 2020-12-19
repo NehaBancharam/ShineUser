@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,77 +7,99 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
+import firebase from "../config/Firebase";
+
 import { MaterialIcons } from "@expo/vector-icons";
 
-import Fire from "../Fire";
+export default Post = ({ navigation }) => {
+  const [text, setText] = useState("");
+  const userID = firebase.auth().currentUser.uid;
 
-const firebase = require("firebase");
-require("firebase/firestore");
+  const [loading, setLoading] = useState(false);
 
-export default class Post extends React.Component {
-  state = {
-    text: "",
+  const postSubmitHandler = () => {
+    setLoading(true);
+    let postRef = firebase.firestore().collection("posts").doc();
+
+    let post = {
+      uid: userID,
+      text,
+      timestamp: firebase.firestore.Timestamp.now(),
+    };
+
+    postRef.set(post).then(() => {
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(userID)
+        .update({
+          posts: firebase.firestore.FieldValue.arrayUnion(postRef.id),
+        })
+        .then(() => {
+          setLoading(false);
+          navigation.goBack();
+        });
+    });
   };
 
-  /* componentDidMount() {
-    this.handlePost();
-  } */
+  useEffect(() => {
+    console.log(userID);
+  }, []);
 
-  handlePost = () => {
-    Fire.shared
-      .addPost({
-        text: this.state.text.trim(),
-      })
-      .then((ref) => {
-        this.setState({ text: "" });
-      })
-      .catch((error) => {
-        alert(error);
-      });
-  };
-
-  //rendering part
-  render() {
-    return (
-      <SafeAreaView style={styles.container}>
-        {/* header style */}
-        <View style={styles.header}>
-          <Text style={{ fontWeight: "500", fontSize: 20 }}>Post </Text>
+  return (
+    <View style={styles.container}>
+      {/* header style */}
+      <View style={styles.header}>
+        <Text style={{ fontWeight: "500", fontSize: 20 }}>Post </Text>
+      </View>
+      {loading ? (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size="large" color="black" />
         </View>
+      ) : (
+        <View style={{ flex: 1 }}>
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <Image
+              source={require("../assets/logo/logo.png")}
+              style={styles.avatar}
+            />
+          </View>
 
-        <View style={styles.inputContainer}>
-          <Image
-            source={require("../assets/login.png")}
-            style={styles.avatar}
-          ></Image>
-          <TextInput
-            autoFocus={true}
-            multiline={true}
-            numberOfLines={4}
-            style={{ flex: 1 }}
-            placeholder="Share your journey with other Shine Brightly members!"
-            onChangeText={(text) => this.setState({ text })}
-            value={this.state.text}
-          ></TextInput>
+          <View style={styles.inputContainer}>
+            <TextInput
+              autoFocus={true}
+              multiline={true}
+              numberOfLines={4}
+              // textAlign="center"
+              placeholder="Share your journey with other Shine Brightly members!"
+              onChangeText={(text) => setText(text)}
+              value={text}
+            ></TextInput>
+            <TouchableOpacity style={styles.photo} onPress={postSubmitHandler}>
+              <MaterialIcons
+                name="check-circle"
+                size={40}
+                color="#634C87"
+              ></MaterialIcons>
+            </TouchableOpacity>
+          </View>
         </View>
-
-        <TouchableOpacity style={styles.photo} onPress={this.handlePost}>
-          <MaterialIcons
-            name="check-circle"
-            size={40}
-            color="#634C87"
-          ></MaterialIcons>
-        </TouchableOpacity>
-      </SafeAreaView>
-    );
-  }
-}
+      )}
+    </View>
+  );
+};
 
 //styling
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
   },
   header: {
     flexDirection: "row",
@@ -89,18 +111,16 @@ const styles = StyleSheet.create({
     borderBottomColor: "#D8D9DB",
   },
   inputContainer: {
-    margin: 32,
-    flexDirection: "row",
+    flex: 1,
+    alignItems: "center",
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: "70%",
+    height: "70%",
     marginRight: 16,
   },
   photo: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    margin: 15,
   },
 });
