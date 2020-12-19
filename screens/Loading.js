@@ -5,7 +5,7 @@ export default class Loading extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Image source={require("../assets/load.png")}></Image>
+        <Image source={require("../assets/splashScreen.png")}></Image>
       </View>
     );
   }
@@ -17,6 +17,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#4f3b72",
+    backgroundColor: "#300016",
   },
 });
