@@ -1,20 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import * as Font from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 
 import MainStack from "./stack/MainStack";
 import Loading from "./screens/Loading";
+import { AppLoading } from "expo";
+
+const fetchFonts = () => {
+  return Font.loadAsync({
+    courgette: require("./assets/fonts/courgette.ttf"),
+    ibarra: require("./assets/fonts/ibarra.ttf"),
+    "ibarra-italic": require("./assets/fonts/ibarra-italic.ttf"),
+  });
+};
 
 export default App = () => {
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
-  React.useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(!isLoading);
-    }, 3000);
-  }, []);
-  return (
-    <NavigationContainer>
-      {isLoading ? <Loading /> : <MainStack />}
-    </NavigationContainer>
-  );
+  if (!dataLoaded) {
+    return (
+      <AppLoading
+        startAsync={fetchFonts}
+        onFinish={() => setDataLoaded(true)}
+        onError={(err) => console.log(err)}
+      />
+    );
+  } else {
+    return (
+      <NavigationContainer>
+        <MainStack />
+      </NavigationContainer>
+    );
+  }
 };
