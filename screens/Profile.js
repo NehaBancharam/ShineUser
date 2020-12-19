@@ -2,6 +2,8 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Button } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
+import firebase from "../config/Firebase";
+
 export default Profile = ({ navigation }) => {
   return (
     <View style={styles.container}>
@@ -39,7 +41,10 @@ export default Profile = ({ navigation }) => {
         </View>
       </View>
       <View>
-        <TouchableOpacity style={styles.logOut}>
+        <TouchableOpacity
+          style={styles.logOut}
+          onPress={() => firebase.auth().signOut()}
+        >
           <Text style={{ fontSize: 14, color: "#ffffff" }}>Log Out</Text>
         </TouchableOpacity>
       </View>
