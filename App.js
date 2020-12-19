@@ -10,7 +10,7 @@ export default App = () => {
   React.useEffect(() => {
     setTimeout(() => {
       setIsLoading(!isLoading);
-    }, 1000);
+    }, 3000);
   }, []);
   return (
     <NavigationContainer>
