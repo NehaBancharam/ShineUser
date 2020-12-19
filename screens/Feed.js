@@ -6,7 +6,6 @@ import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
 
 import firebase from "../config/Firebase";
 import { useEffect } from "react";
-import { sub } from "react-native-reanimated";
 
 const { width, height } = Dimensions.get("screen");
 const logo = require("../assets/logo/logo.png");
