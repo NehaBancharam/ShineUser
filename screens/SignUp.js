@@ -1,14 +1,12 @@
 import React from "react";
 import { View, Text, StyleSheet, StatusBar, Image, Switch } from "react-native";
 import { TouchableOpacity, TextInput } from "react-native-gesture-handler";
-import Fire from "../Fire";
-
 
 export default class SignUp extends React.Component {
   static navigationOptions = {
     headerShown: false,
   };
-  
+
   state = {
     user: {
       name: "",
@@ -16,15 +14,6 @@ export default class SignUp extends React.Component {
       password: "",
     },
     errorMsg: null,
-  };
-
-  handleSignUp = () => {
-    if (this.state.user.name.trim() === "") {
-      alert("Name is required");
-    } else {
-      Fire.shared.createUser(this.state.user);
-    }
-    
   };
 
   render() {
@@ -43,7 +32,6 @@ export default class SignUp extends React.Component {
           <Image source={require("../assets/signup.png")}></Image>
         </View>
 
-     
         <View
           style={{
             position: "absolute",
