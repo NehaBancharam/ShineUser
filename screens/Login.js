@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,31 +6,39 @@ import {
   Image,
   StatusBar,
   LayoutAnimation,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+  ActivityIndicator,
 } from "react-native";
-import { TouchableOpacity, TextInput } from "react-native-gesture-handler";
-import * as firebase from "firebase";
+import { TextInput } from "react-native-paper";
+import firebase from "../config/Firebase";
 
-export default class Login extends React.Component {
-  static navigationOptions = {
-    headerShown: false,
-  };
-  state = {
-    email: "",
-    password: "",
-    errorMsg: null,
-  };
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-  handleLogin = () => {
-    const { email, password } = this.state;
+const { height } = Dimensions.get("screen");
+
+export default Login = ({ navigation }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const [loading, setLoading] = useState(false);
+
+  const signInHandler = () => {
+    setErrorMessage("");
+    setLoading(true);
+
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
-      .catch((error) => this.setState({ errorMsg: error.message }));
+      .then(() => setLoading(false))
+      .catch((error) => setLoading(false));
   };
 
-  render() {
-    LayoutAnimation.easeInEaseOut();
-    return (
+  return (
+    <ScrollView scrollEnabled>
       <View style={styles.container}>
         <StatusBar barStyle="light-content"></StatusBar>
         <View
@@ -44,45 +52,71 @@ export default class Login extends React.Component {
         </View>
 
         <View style={styles.errorMsg}>
-          {this.state.errorMsg && (
-            <Text style={styles.error}>{this.state.errorMsg}</Text>
+          {errorMessage ? (
+            <Text style={styles.error}>{errorMessage}</Text>
+          ) : (
+            <></>
           )}
         </View>
 
         {/* //form code */}
         <View style={styles.form}>
           <View>
-            <Text style={styles.inputTitle}>Email Address</Text>
             <TextInput
+              label="Email Address"
+              mode="outlined"
               style={styles.input}
-              autoCapitalize="none"
-              placeholder="Insert email"
-              onChangeText={(email) => this.setState({ email })}
-              value={this.state.email}
-            ></TextInput>
+              onChangeText={(email) => setEmail(email)}
+              value={email}
+            />
           </View>
-          <View style={{ marginTop: 32 }}>
-            <Text style={styles.inputTitle}>Password</Text>
+          <View
+            style={{
+              marginTop: 32,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
             <TextInput
-              style={styles.input}
-              secureTextEntry
-              autoCapitalize="none"
-              placeholder="Insert password"
-              onChangeText={(password) => this.setState({ password })}
-              value={this.state.password}
-            ></TextInput>
+              label="Password"
+              mode="outlined"
+              style={[{ flex: 1 }, styles.input]}
+              secureTextEntry={passwordVisible}
+              onChangeText={(password) => setPassword(password)}
+              value={password}
+            />
+            <TouchableOpacity
+              style={{
+                marginLeft: 15,
+                position: "absolute",
+                right: 15,
+                alignSelf: "center",
+              }}
+              onPress={() => setPasswordVisible(!passwordVisible)}
+            >
+              <MaterialCommunityIcons
+                name={passwordVisible ? "eye-off" : "eye"}
+                size={24}
+              />
+            </TouchableOpacity>
           </View>
         </View>
 
         {/* //sign in button */}
-        <TouchableOpacity style={styles.button} onPress={this.handleLogin}>
-          <Text style={{ color: "#FFF", fontWeight: "500" }}>Sign In</Text>
+        <TouchableOpacity style={styles.button} onPress={signInHandler}>
+          <Text style={{ color: "#FFF", fontWeight: "500" }}>
+            {loading ? (
+              <ActivityIndicator size="large" color="white" />
+            ) : (
+              "Sign In"
+            )}
+          </Text>
         </TouchableOpacity>
 
         {/* sign up button */}
         <TouchableOpacity
           style={{ alignSelf: "center", marginTop: 25 }}
-          onPress={() => this.props.navigation.navigate("SignUp")}
+          onPress={() => navigation.navigate("SignUp")}
         >
           <Text style={{ color: "#414959", fontSize: 13 }}>
             New to Shine Brightly?{" "}
@@ -92,13 +126,14 @@ export default class Login extends React.Component {
           </Text>
         </TouchableOpacity>
       </View>
-    );
-  }
-}
+    </ScrollView>
+  );
+};
 //format
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    height,
   },
   errorMsg: {
     height: 40,
@@ -137,5 +172,3 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
-
-
