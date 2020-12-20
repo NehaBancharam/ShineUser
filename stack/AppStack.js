@@ -4,10 +4,12 @@ import { createMaterialBottomTabNavigator } from "@react-navigation/material-bot
 import { MaterialIcons } from "@expo/vector-icons";
 
 import ProfileStack from "./ProfileStack";
-import Home from "../screens/Home";
+import Home from "../screens/Home/Home";
 import Feed from "../screens/Feed";
 import { createStackNavigator } from "@react-navigation/stack";
 import Post from "../screens/Post";
+import ViewCategory from "../screens/Home/ViewCategory";
+import ScanCode from "../screens/Home/ScanCode";
 
 // const Tab = createBottomTabNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -67,10 +69,30 @@ const FeedStack = () => (
   </Stack.Navigator>
 );
 
+const HomeStack = () => (
+  <Stack.Navigator>
+    <Stack.Screen
+      name="HomeScreen"
+      component={Home}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="ViewCategory"
+      component={ViewCategory}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="ScanCode"
+      component={ScanCode}
+      options={{ headerShown: false }}
+    />
+  </Stack.Navigator>
+);
+
 export default BottomTabNavigator = () => {
   return (
     <Tab.Navigator screenOptions={screenOptions} barStyle={barStyle} shifting>
-      <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen name="Home" component={HomeStack} />
       <Tab.Screen name="Feed" component={FeedStack} />
       <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>
