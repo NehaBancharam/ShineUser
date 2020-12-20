@@ -122,8 +122,7 @@ export default Feed = ({ navigation }) => {
             padding: 15,
             justifyContent: "center",
             alignItems: "center",
-            borderBottomWidth: showAll ? 1 : 0,
-            borderBottomColor: "purple",
+            backgroundColor: showAll ? "#634C87" : "white",
           }}
         >
           <TouchableOpacity
@@ -135,7 +134,9 @@ export default Feed = ({ navigation }) => {
               }
             }}
           >
-            <Text>All Posts</Text>
+            <Text style={{ color: showAll ? "white" : "black" }}>
+              All Posts
+            </Text>
           </TouchableOpacity>
         </View>
         <View
@@ -144,8 +145,7 @@ export default Feed = ({ navigation }) => {
             padding: 15,
             justifyContent: "center",
             alignItems: "center",
-            borderBottomWidth: showAll ? 0 : 1,
-            borderBottomColor: "purple",
+            backgroundColor: showAll ? "white" : "#634C87",
           }}
         >
           <TouchableOpacity
@@ -157,7 +157,9 @@ export default Feed = ({ navigation }) => {
               }
             }}
           >
-            <Text>Your Posts</Text>
+            <Text style={{ color: showAll ? "black" : "white" }}>
+              Your Posts
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -166,8 +168,9 @@ export default Feed = ({ navigation }) => {
         {showAll ? (
           <>
             <Searchbar
-              placeholder="Search By Username"
+              placeholder="Search Username"
               onChangeText={(search) => getPostsHandler(search)}
+              style={{ margin: 15, borderRadius: 20, fontSize: 10 }}
             />
 
             <View style={{ flex: 1, marginTop: 5 }}>
@@ -210,6 +213,7 @@ export default Feed = ({ navigation }) => {
       </View>
       <FAB
         style={styles.fab}
+        color="white"
         icon="plus"
         onPress={() => navigation.navigate("Post")}
       />
@@ -233,6 +237,7 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: "absolute",
+    backgroundColor: "#634C87",
     margin: 16,
     right: 0,
     bottom: 0,
