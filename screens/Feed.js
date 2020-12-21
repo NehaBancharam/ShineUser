@@ -6,21 +6,18 @@ import {
   Dimensions,
   FlatList,
   RefreshControl,
+  Image,
 } from "react-native";
-import { Avatar, FAB, Searchbar } from "react-native-paper";
-
-import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
+import { FAB, Searchbar } from "react-native-paper";
+import PostCard from "../components/feed/PostCard";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 import firebase from "../config/Firebase";
 
 import { LogBox } from "react-native";
 import _ from "lodash";
-import PostCard from "../components/feed/PostCard";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { TouchableOpacity } from "react-native-gesture-handler";
-
-const { width, height } = Dimensions.get("screen");
-const logo = require("../assets/logo/logo.png");
+import Empty from "../components/feed/Empty";
+import Header from "../components/Header";
 
 LogBox.ignoreLogs(["Setting a timer"]);
 const _console = _.clone(console);
@@ -29,8 +26,6 @@ console.warn = (message) => {
     _console.warn(message);
   }
 };
-
-const Tab = createMaterialTopTabNavigator();
 
 export default Feed = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
@@ -49,6 +44,7 @@ export default Feed = ({ navigation }) => {
         .firestore()
         .collection("posts")
         .where("username", "==", query)
+        .orderBy("timestamp", "desc")
         .get()
         .then((querySnapshot) => {
           let tempPosts = [];
@@ -90,6 +86,7 @@ export default Feed = ({ navigation }) => {
       .firestore()
       .collection("posts")
       .where("uid", "==", userID)
+      .orderBy("timestamp", "desc")
       .get()
       .then((querySnapshot) => {
         let tempPosts = [];
@@ -102,7 +99,31 @@ export default Feed = ({ navigation }) => {
         setUserPosts(tempPosts);
         setLoading(false);
       })
-      .catch((error) => {});
+      .catch((error) => {
+        console.log(error);
+        setLoading(false);
+      });
+  };
+
+  const deletePostHandler = (postID) => {
+    firebase
+      .firestore()
+      .collection("posts")
+      .doc(postID)
+      .delete()
+      .then(() => {
+        firebase
+          .firestore()
+          .collection("users")
+          .doc(userID)
+          .update({
+            posts: firebase.firestore.FieldValue.arrayRemove(postID),
+          })
+          .then(() => {
+            getPostsHandler();
+            getUserPostsHandler();
+          });
+      });
   };
 
   useEffect(() => {
@@ -112,9 +133,7 @@ export default Feed = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={{ fontWeight: "500", fontSize: 20 }}>Feed </Text>
-      </View>
+      <Header title="Feed" />
       <View style={{ flexDirection: "row" }}>
         <View
           style={{
@@ -166,37 +185,57 @@ export default Feed = ({ navigation }) => {
 
       <View style={{ flex: 1, backgroundColor: "white" }}>
         {showAll ? (
-          <>
-            <Searchbar
-              placeholder="Search Username"
-              onChangeText={(search) => getPostsHandler(search)}
-              style={{ margin: 15, borderRadius: 20, fontSize: 10 }}
-            />
-
-            <View style={{ flex: 1, marginTop: 5 }}>
-              <FlatList
-                data={posts}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => <PostCard post={item} />}
-                refreshControl={
-                  <RefreshControl
-                    colors={["black"]}
-                    progressBackgroundColor="white"
-                    refreshing={loading}
-                    onRefresh={() => {
-                      getPostsHandler();
-                    }}
-                  />
-                }
+          posts.length > 0 ? (
+            <>
+              <Searchbar
+                placeholder="Search Username"
+                onChangeText={(search) => getPostsHandler(search)}
+                style={{ margin: 15, borderRadius: 20, fontSize: 10 }}
               />
-            </View>
-          </>
-        ) : (
+
+              <View style={{ flex: 1, marginTop: 5 }}>
+                <FlatList
+                  data={posts}
+                  keyExtractor={(item) => item.id}
+                  renderItem={({ item }) =>
+                    item.uid === userID ? (
+                      <PostCard
+                        post={item}
+                        deletable
+                        onDelete={deletePostHandler}
+                      />
+                    ) : (
+                      <PostCard post={item} />
+                    )
+                  }
+                  refreshControl={
+                    <RefreshControl
+                      colors={["black"]}
+                      progressBackgroundColor="white"
+                      refreshing={loading}
+                      onRefresh={() => {
+                        getPostsHandler();
+                      }}
+                    />
+                  }
+                />
+              </View>
+            </>
+          ) : (
+            <Empty
+              label="No Posts"
+              onRefresh={getPostsHandler}
+              loading={loading}
+            />
+          )
+        ) : userPosts.length > 0 ? (
           <View style={{ flex: 1, marginTop: 5 }}>
             <FlatList
               data={userPosts}
               keyExtractor={(item) => item.id}
-              renderItem={({ item }) => <PostCard post={item} />}
+              renderItem={({ item }) => (
+                <PostCard post={item} deletable onDelete={deletePostHandler} />
+              )}
               refreshControl={
                 <RefreshControl
                   colors={["black"]}
@@ -209,6 +248,12 @@ export default Feed = ({ navigation }) => {
               }
             />
           </View>
+        ) : (
+          <Empty
+            label="No Posts"
+            onRefresh={getUserPostsHandler}
+            loading={loading}
+          />
         )}
       </View>
       <FAB
@@ -235,6 +280,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#D8D9DB",
     backgroundColor: "white",
   },
+
   fab: {
     position: "absolute",
     backgroundColor: "#634C87",
