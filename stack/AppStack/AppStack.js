@@ -1,20 +1,13 @@
 import React from "react";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import ProfileStack from "./ProfileStack";
-import Home from "../screens/Home/Home";
-import Feed from "../screens/Feed";
-import { createStackNavigator } from "@react-navigation/stack";
-import Post from "../screens/Post";
-import ViewCategory from "../screens/Home/ViewCategory";
-import ScanCode from "../screens/Home/ScanCode";
+import FeedStack from "./FeedStack";
+import HomeStack from "./HomeStack";
 
 // const Tab = createBottomTabNavigator();
 const Tab = createMaterialBottomTabNavigator();
-
-const Stack = createStackNavigator();
 
 const barStyle = {
   backgroundColor: "white",
@@ -53,41 +46,6 @@ const screenOptions = ({ route }) => ({
     );
   },
 });
-
-const FeedStack = () => (
-  <Stack.Navigator>
-    <Stack.Screen
-      name="ViewFeed"
-      component={Feed}
-      options={{ headerShown: false }}
-    />
-    <Stack.Screen
-      name="Post"
-      component={Post}
-      options={{ headerShown: false }}
-    />
-  </Stack.Navigator>
-);
-
-const HomeStack = () => (
-  <Stack.Navigator>
-    <Stack.Screen
-      name="HomeScreen"
-      component={Home}
-      options={{ headerShown: false }}
-    />
-    <Stack.Screen
-      name="ViewCategory"
-      component={ViewCategory}
-      options={{ headerShown: false }}
-    />
-    <Stack.Screen
-      name="ScanCode"
-      component={ScanCode}
-      options={{ headerShown: false }}
-    />
-  </Stack.Navigator>
-);
 
 export default BottomTabNavigator = () => {
   return (
