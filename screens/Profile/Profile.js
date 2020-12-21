@@ -4,10 +4,9 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Button,
   ActivityIndicator,
   ScrollView,
-  Dimensions,
+  Modal,
 } from "react-native";
 import { List, TextInput } from "react-native-paper";
 import {
@@ -16,21 +15,24 @@ import {
   AntDesign,
 } from "@expo/vector-icons";
 import Header from "../../components/Header";
-import moment from "moment";
 import firebase from "../../config/Firebase";
 import UserCard from "../../components/profile/UserCard";
 import ReservedWords from "../../constants/ReservedWords";
-const { height } = Dimensions.get("screen");
+import InfoModal from "../../components/profile/InfoModal";
 
 export default Profile = ({ navigation }) => {
   const userID = firebase.auth().currentUser.uid;
-  const userEmail = firebase.auth().currentUser.email;
   const [user, setUser] = useState(null);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalText, setModalText] = useState("");
 
   const [username, setUsername] = useState("");
   const [usernameInvalid, setUsernameInvalid] = useState(false);
-  const [password, setPassword] = useState("");
-  const [passwordInvalid, setPasswordInvalid] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [currentPasswordInvalid, setCurrentPasswordInvalid] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [newPasswordInvalid, setNewPasswordInvalid] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -38,8 +40,15 @@ export default Profile = ({ navigation }) => {
   const [usernameLoading, setUsernameLoading] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
 
-  const clearErrors = () => {
+  const clearUserNameErrors = () => {
     setErrorMessage("");
+    setUsernameInvalid(false);
+  };
+
+  const clearPasswordErrors = () => {
+    setErrorMessage("");
+    setNewPasswordInvalid(false);
+    setCurrentPasswordInvalid(false);
   };
 
   const getUserData = () => {
@@ -51,35 +60,29 @@ export default Profile = ({ navigation }) => {
       .doc(userID)
       .onSnapshot((doc) => {
         setUser(doc.data());
-        console.log(doc.data().dateJoined);
         setLoading(false);
       });
   };
 
+  const modalHandler = (text, visible) => {
+    setModalVisible(visible);
+    setModalText(text);
+  };
+
   const checkErrorCode = (code) => {
     if (code === "auth/too-many-requests") {
-      setErrorMessage("System locked. Try to login after some time.");
-    }
-    if (code === "auth/invalid-email") {
-      setErrorMessage("Email badly formatted.");
-      setEmailInvalid(true);
-    }
-    if (code === "auth/email-already-in-use") {
-      setErrorMessage("An account with the same email address already exists.");
-      setEmailInvalid(true);
-    }
-    if (code === "auth/user-not-found") {
-      setErrorMessage("No account with this email found.");
+      setErrorMessage("System locked. Try again after some time.");
     }
     if (code === "auth/wrong-password") {
-      setErrorMessage("Incorrect password. Try again.");
-      setPasswordInvalid(true);
+      setErrorMessage(
+        "Password entered does not match your current password. Try again."
+      );
     }
   };
 
   const changeUsernameHandler = () => {
+    clearUserNameErrors();
     setUsernameLoading(true);
-    setUsernameInvalid(false);
 
     if (username.length > 0) {
       if (!ReservedWords.includes(username.toLocaleLowerCase())) {
@@ -102,6 +105,7 @@ export default Profile = ({ navigation }) => {
                   username,
                 })
                 .then(() => {
+                  modalHandler("Your username has been changed", true);
                   setUsername("");
                   setUsernameInvalid(false);
                   setUsernameLoading(false);
@@ -117,20 +121,89 @@ export default Profile = ({ navigation }) => {
       }
     } else {
       setErrorMessage("Enter a username");
+      setUsernameInvalid(true);
       setUsernameLoading(false);
     }
   };
 
-  const changePasswordHandler = () => {};
+  const reauthenticate = (currentPassword) => {
+    let user = firebase.auth().currentUser;
+    let credentials = firebase.auth.EmailAuthProvider.credential(
+      user.email,
+      currentPassword
+    );
+
+    return user.reauthenticateWithCredential(credentials);
+  };
+
+  const changePasswordHandler = () => {
+    clearPasswordErrors();
+    setPasswordLoading(true);
+
+    let regex = /((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{6,}))/;
+
+    if (newPassword.length === 0) {
+      setErrorMessage("Enter a new password.");
+      setNewPasswordInvalid(true);
+      setPasswordLoading(false);
+    } else if (currentPassword === newPassword) {
+      setErrorMessage("New password cannot be the same as current password.");
+      setCurrentPasswordInvalid(true);
+      setNewPasswordInvalid(true);
+      setPasswordLoading(false);
+    } else if (!regex.test(newPassword)) {
+      setErrorMessage(
+        "New password must contain atleast 1 capital, 1 small letter and 1 number and be 6 characters long."
+      );
+      setNewPasswordInvalid(true);
+      setPasswordLoading(false);
+    } else {
+      reauthenticate(currentPassword)
+        .then(() => {
+          setCurrentPassword("");
+          setNewPassword("");
+          let user = firebase.auth().currentUser;
+          user
+            .updatePassword(newPassword)
+            .then(() => {
+              modalHandler("Your password has been changed", true);
+              setNewPasswordInvalid(false);
+              setPasswordLoading(false);
+            })
+            .catch((error) => {
+              checkErrorCode(error.code);
+              setCurrentPasswordInvalid(true);
+              setPasswordLoading(false);
+            });
+        })
+        .catch((error) => {
+          checkErrorCode(error.code);
+          setCurrentPasswordInvalid(true);
+          setPasswordLoading(false);
+        });
+    }
+  };
 
   useEffect(() => getUserData(), []);
 
   return (
     <View style={styles.container}>
+      <InfoModal
+        label={modalText}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(false);
+          setModalText("");
+        }}
+      />
       {/* header style */}
       <Header
         title="Profile"
-        right={<AntDesign name="logout" size={20} color="#634C87" />}
+        right={
+          <TouchableOpacity onPress={() => firebase.auth().signOut()}>
+            <AntDesign name="logout" size={20} color="#634C87" />
+          </TouchableOpacity>
+        }
       />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         {/* other screens */}
@@ -153,13 +226,17 @@ export default Profile = ({ navigation }) => {
                 <></>
               )}
               <List.AccordionGroup>
-                <List.Accordion title="Edit Username" id="1">
+                <List.Accordion
+                  title="Edit Username"
+                  id="1"
+                  onPress={() => console.log("pj")}
+                >
                   <View style={{ marginHorizontal: 15 }}>
                     <Text style={{ textAlign: "center" }}>
                       Changes to your username will be effected immediately.
                     </Text>
                     <TextInput
-                      onFocus={clearErrors}
+                      onFocus={clearUserNameErrors}
                       error={usernameInvalid}
                       label="Username"
                       mode="outlined"
@@ -182,7 +259,11 @@ export default Profile = ({ navigation }) => {
                     </TouchableOpacity>
                   </View>
                 </List.Accordion>
-                <List.Accordion title="Edit Password" id="2">
+                <List.Accordion
+                  title="Edit Password"
+                  id="2"
+                  onPress={clearPasswordErrors}
+                >
                   <View style={{ marginHorizontal: 15 }}>
                     <View
                       style={{
@@ -191,16 +272,50 @@ export default Profile = ({ navigation }) => {
                       }}
                     >
                       <TextInput
-                        onFocus={clearErrors}
-                        error={passwordInvalid}
-                        label="Password"
+                        onFocus={clearPasswordErrors}
+                        error={currentPasswordInvalid}
+                        label="Current Password"
                         mode="outlined"
                         style={[{ flex: 1 }, styles.input]}
                         secureTextEntry={passwordVisible}
                         onChangeText={(password) =>
-                          setPassword(password.trim())
+                          setCurrentPassword(password.trim())
                         }
-                        value={password.trim()}
+                        value={currentPassword.trim()}
+                        theme={{ colors: { primary: "purple" } }}
+                      />
+                      <TouchableOpacity
+                        style={{
+                          marginLeft: 15,
+                          position: "absolute",
+                          right: 15,
+                          alignSelf: "center",
+                        }}
+                        onPress={() => setPasswordVisible(!passwordVisible)}
+                      >
+                        <MaterialCommunityIcons
+                          name={passwordVisible ? "eye-off" : "eye"}
+                          size={24}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
+                      <TextInput
+                        onFocus={clearPasswordErrors}
+                        error={newPasswordInvalid}
+                        label="New Password"
+                        mode="outlined"
+                        style={[{ flex: 1 }, styles.input]}
+                        secureTextEntry={passwordVisible}
+                        onChangeText={(password) =>
+                          setNewPassword(password.trim())
+                        }
+                        value={newPassword.trim()}
                         theme={{ colors: { primary: "purple" } }}
                       />
                       <TouchableOpacity
@@ -220,10 +335,10 @@ export default Profile = ({ navigation }) => {
                     </View>
                     <TouchableOpacity
                       style={styles.button}
-                      onPress={changeUsernameHandler}
+                      onPress={changePasswordHandler}
                     >
                       <Text style={{ color: "#FFF", fontWeight: "500" }}>
-                        {usernameLoading ? (
+                        {passwordLoading ? (
                           <ActivityIndicator size="small" color="white" />
                         ) : (
                           "Change Password"
@@ -275,7 +390,7 @@ export default Profile = ({ navigation }) => {
             <Text
               style={{ color: "#D3D3D3", fontSize: 10, textAlign: "center" }}
             >
-              @ Copyright 2021 All Rights Reserved
+              © Copyright 2021 All Rights Reserved
             </Text>
           </View>
         </View>
