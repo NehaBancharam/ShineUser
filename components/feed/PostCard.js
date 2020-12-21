@@ -4,19 +4,17 @@ import {
   Text,
   StyleSheet,
   Dimensions,
-  ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
-import { Searchbar } from "react-native-paper";
 import moment from "moment";
 
-import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
+import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
 
-import firebase from "../../config/Firebase";
 
-const { width, height } = Dimensions.get("screen");
+const { width } = Dimensions.get("screen");
 
-const PostCard = ({ post }) => {
-  const { id, text, timestamp, uid, username } = post;
+const PostCard = ({ post, deletable, onDelete }) => {
+  const { id, text, timestamp, username } = post;
 
   return (
     <View style={styles.container}>
@@ -27,15 +25,30 @@ const PostCard = ({ post }) => {
           paddingBottom: 15,
         }}
       >
-        <FontAwesome name="user-circle-o" size={30} color="gray" />
+        <FontAwesome name="user-circle-o" size={30} color="#634C87" />
         <View style={{ marginHorizontal: 10 }}>
-          <Text style={{ color: "gray", fontSize: 17, fontWeight: "bold" }}>
+          <Text style={{ color: "#634C87", fontSize: 17, fontWeight: "bold" }}>
             {username}
           </Text>
           <Text style={{ color: "gray", fontSize: 14 }}>
             {moment(timestamp.toDate()).fromNow()}
           </Text>
         </View>
+        {deletable ? (
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row-reverse",
+              height: "100%",
+            }}
+          >
+            <TouchableOpacity onPress={() => onDelete(id)}>
+              <MaterialIcons name="delete" size={20} color="#634C87" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <></>
+        )}
       </View>
 
       <View
