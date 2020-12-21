@@ -69,7 +69,7 @@ const SignUp = ({ navigation }) => {
     clearErrors();
 
     setLoading(true);
-    let regex = /((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,}))/;
+    let regex = /((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{6,}))/;
 
     if (email.length === 0 && password.length === 0 && username.length === 0) {
       setErrorMessage("Fields cannot be left blank");
@@ -91,7 +91,7 @@ const SignUp = ({ navigation }) => {
       setLoading(false);
     } else if (!regex.test(password)) {
       setErrorMessage(
-        "Password must contain atleast 1 capital, 1 small letter and 1 number and be 8 characters long."
+        "Password must contain atleast 1 capital, 1 small letter and 1 number and be 6 characters long."
       );
       setPasswordInvalid(true);
       setLoading(false);
@@ -112,13 +112,12 @@ const SignUp = ({ navigation }) => {
                 .auth()
                 .createUserWithEmailAndPassword(email, password)
                 .then(() => {
-                  console.log("HELP");
                   let userID = firebase.auth().currentUser.uid;
-                  console.log(userID);
                   firebase.firestore().collection("users").doc(userID).set({
                     username,
                     posts: [],
                     categoriesCompleted: [],
+                    dateJoined: firebase.firestore.Timestamp.now(),
                   });
                 })
                 .catch((error) => {
@@ -299,7 +298,7 @@ const SignUp = ({ navigation }) => {
             style={styles.input}
             onChangeText={(email) => setEmail(email.trim())}
             value={email.trim()}
-            keyboardType='email-address'
+            keyboardType="email-address"
             theme={{ colors: { primary: "purple" } }}
           />
           <View
