@@ -9,11 +9,12 @@ import {
   TextInput,
   ActivityIndicator,
   Dimensions,
-  ScrollView
+  ScrollView,
 } from "react-native";
 import firebase from "../config/Firebase";
 
 import { MaterialIcons } from "@expo/vector-icons";
+import Header from "../components/Header";
 
 const { height } = Dimensions.get("screen");
 
@@ -63,22 +64,17 @@ export default Post = ({ navigation }) => {
   };
 
   return (
-    <ScrollView scrollEnabled>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
         {/* header style */}
-        <View style={styles.header}>
-          <View style={{ flex: 1 }}>
+        <Header
+          title="Post"
+          left={
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <MaterialIcons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
-          </View>
-          <View
-            style={{ flex: 3, justifyContent: "center", alignItems: "center" }}
-          >
-            <Text style={{ fontWeight: "500", fontSize: 20 }}>Post</Text>
-          </View>
-          <View style={{ flex: 1 }}></View>
-        </View>
+          }
+        />
         {loading ? (
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -161,7 +157,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    height: height - 100,
   },
   header: {
     flexDirection: "row",
