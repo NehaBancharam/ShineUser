@@ -57,7 +57,10 @@ export default Feed = ({ navigation }) => {
           setPosts(tempPosts);
           setLoading(false);
         })
-        .catch((error) => {});
+        .catch((error) => {
+          console.log(error);
+          setLoading(false);
+        });
     } else {
       firebase
         .firestore()
@@ -76,7 +79,10 @@ export default Feed = ({ navigation }) => {
           setPosts(tempPosts);
           setLoading(false);
         })
-        .catch((error) => {});
+        .catch((error) => {
+          console.log(error);
+          setLoading(false);
+        });
     }
   };
 
@@ -185,49 +191,50 @@ export default Feed = ({ navigation }) => {
 
       <View style={{ flex: 1, backgroundColor: "white" }}>
         {showAll ? (
-          posts.length > 0 ? (
-            <>
-              <Searchbar
-                placeholder="Search Username"
-                onChangeText={(search) => getPostsHandler(search)}
-                style={{ margin: 15, borderRadius: 20, fontSize: 10 }}
-              />
-
-              <View style={{ flex: 1, marginTop: 5 }}>
-                <FlatList
-                  data={posts}
-                  keyExtractor={(item) => item.id}
-                  renderItem={({ item }) =>
-                    item.uid === userID ? (
-                      <PostCard
-                        post={item}
-                        deletable
-                        onDelete={deletePostHandler}
-                      />
-                    ) : (
-                      <PostCard post={item} />
-                    )
-                  }
-                  refreshControl={
-                    <RefreshControl
-                      colors={["black"]}
-                      progressBackgroundColor="white"
-                      refreshing={loading}
-                      onRefresh={() => {
-                        getPostsHandler();
-                      }}
-                    />
-                  }
-                />
-              </View>
-            </>
-          ) : (
-            <Empty
-              label="No Posts"
-              onRefresh={getPostsHandler}
-              loading={loading}
+          <>
+            <Searchbar
+              placeholder="Search Username"
+              onChangeText={(search) => getPostsHandler(search)}
+              style={{ margin: 15, borderRadius: 20, fontSize: 10 }}
             />
-          )
+            {posts.length > 0 ? (
+              <>
+                <View style={{ flex: 1, marginTop: 5 }}>
+                  <FlatList
+                    data={posts}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) =>
+                      item.uid === userID ? (
+                        <PostCard
+                          post={item}
+                          deletable
+                          onDelete={deletePostHandler}
+                        />
+                      ) : (
+                        <PostCard post={item} />
+                      )
+                    }
+                    refreshControl={
+                      <RefreshControl
+                        colors={["black"]}
+                        progressBackgroundColor="white"
+                        refreshing={loading}
+                        onRefresh={() => {
+                          getPostsHandler();
+                        }}
+                      />
+                    }
+                  />
+                </View>
+              </>
+            ) : (
+              <Empty
+                label="No Posts"
+                onRefresh={getPostsHandler}
+                loading={loading}
+              />
+            )}
+          </>
         ) : userPosts.length > 0 ? (
           <View style={{ flex: 1, marginTop: 5 }}>
             <FlatList
