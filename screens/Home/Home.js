@@ -3,23 +3,19 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   ImageBackground,
   ScrollView,
   Dimensions,
   FlatList,
-  RefreshControl,
-  TouchableOpacity,
-  ActivityIndicator,
 } from "react-native";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import * as Permissions from "expo-permissions";
 import CategoryCard from "../../components/home/CategoryCard";
+import Loading from "../../components/Loading";
+import Header from "../../components/Header";
 
 import firebase from "../../config/Firebase";
-
-const { width, height } = Dimensions.get("screen");
 
 const themeBackground = require("../../assets/home.png");
 
@@ -172,21 +168,19 @@ const Home = ({ navigation }) => {
   }, []);
 
   if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="black" />
-      </View>
-    );
+    return <Loading label="Loading" />;
   } else {
     return (
       <View style={styles.container}>
         <ScrollView scrollEnabled>
           {/* header style */}
-          <View style={styles.header}>
-            <Text style={{ fontWeight: "500", fontSize: 20 }}>
-              Hi {user.username}!
-            </Text>
-          </View>
+          <Header
+            left={
+              <Text style={{ fontWeight: "500", fontSize: 20 }}>
+                Hi {user ? user.username : ""}!
+              </Text>
+            }
+          />
 
           <View style={{ height: "20%", padding: 15 }}>
             <ImageBackground

@@ -18,6 +18,7 @@ import * as Notifications from "expo-notifications";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import firebase from "../../config/Firebase";
+import Header from "../../components/Header";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -97,21 +98,16 @@ const ViewCategory = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={{ flex: 1 }}>
+      <Header
+        title={<Text style={{ fontWeight: "500", fontSize: 20 }}>{title}</Text>}
+        left={
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <MaterialIcons name="arrow-back" size={24} color="black" />
           </TouchableOpacity>
-        </View>
-        <View
-          style={{ flex: 3, justifyContent: "center", alignItems: "center" }}
-        >
-          <Text style={{ fontWeight: "500", fontSize: 20 }}>{title}</Text>
-        </View>
-        <View style={{ flex: 1 }}></View>
-      </View>
-      <ScrollView scrollEnabled>
-        <View style={{ flex: 1, height, marginHorizontal: 15 }}>
+        }
+      />
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={{ flex: 1, marginHorizontal: 15 }}>
           <View
             style={{
               flex: 1,
@@ -121,7 +117,8 @@ const ViewCategory = ({ navigation, route }) => {
           >
             <Image
               source={{ uri: imageUrl }}
-              style={{ width: width - 100, height: "100%" }}
+              resizeMode="contain"
+              style={{ width: "100%", height: "100%" }}
             />
           </View>
           <View style={{ flex: 1 }}>
@@ -217,15 +214,6 @@ const ViewCategory = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 32,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#D8D9DB",
     backgroundColor: "white",
   },
 });
