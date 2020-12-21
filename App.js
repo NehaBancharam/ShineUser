@@ -3,14 +3,13 @@ import * as Font from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 
 import MainStack from "./stack/MainStack";
-import Loading from "./screens/Loading";
 import { AppLoading } from "expo";
 
 const fetchFonts = () => {
   return Font.loadAsync({
-    courgette: require("./assets/fonts/courgette.ttf"),
     ibarra: require("./assets/fonts/ibarra.ttf"),
     "ibarra-italic": require("./assets/fonts/ibarra-italic.ttf"),
+    "ibarra-italic-bold": require("./assets/fonts/ibarra-italic-bold.ttf"),
   });
 };
 
