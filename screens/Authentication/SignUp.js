@@ -78,7 +78,7 @@ const SignUp = ({ navigation }) => {
       setPasswordInvalid(true);
       setLoading(false);
     } else if (username.length === 0) {
-      setErrorMessage("Enter your name.");
+      setErrorMessage("Enter a username.");
       setUsernameInvalid(true);
       setLoading(false);
     } else if (email.length === 0) {
