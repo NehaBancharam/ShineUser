@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import AuthStack from "./AuthStack";
-import AppStack from "./AppStack";
+import AppStack from "./AppStack/AppStack";
 
 import firebase from "../config/Firebase";
 
