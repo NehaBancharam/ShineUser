@@ -4,10 +4,8 @@ import {
   Text,
   StyleSheet,
   Image,
-  StatusBar,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
   ActivityIndicator,
 } from "react-native";
 import { TextInput } from "react-native-paper";
@@ -16,11 +14,10 @@ import firebase from "../../config/Firebase";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ErrorMessage from "../../components/ErrorMessage";
 
-const { height } = Dimensions.get("screen");
-
 const logo = require("../../assets/login.png");
 
 const Login = ({ navigation }) => {
+  // Screen states
   const [email, setEmail] = useState("");
   const [emailInvalid, setEmailInvalid] = useState(false);
   const [password, setPassword] = useState("");
@@ -131,7 +128,7 @@ const Login = ({ navigation }) => {
             theme={{ colors: { primary: "purple" } }}
           />
           {/* Password Input */}
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={styles.passwordContainer}>
             <TextInput
               onFocus={clearErrors}
               error={passwordInvalid}
@@ -166,7 +163,7 @@ const Login = ({ navigation }) => {
         {/* Sign In Button */}
         <TouchableOpacity style={styles.button} onPress={signInHandler}>
           <Text style={styles.buttonText}>
-            {/* Checks if loading; displays spinner if yes else displays Sign in */}
+            {/* Checks if loading; displays spinner if yes else displays Sign In */}
             {loading ? (
               <ActivityIndicator size="large" color="white" />
             ) : (
@@ -214,6 +211,10 @@ const styles = StyleSheet.create({
     color: "#161F3D",
     backgroundColor: "white",
     marginVertical: 5,
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   showPasswordIcon: {
     marginLeft: 15,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -10,7 +10,6 @@ import {
   Dimensions,
   ActivityIndicator,
   Modal,
-  ToastAndroid,
 } from "react-native";
 
 import { TextInput } from "react-native-paper";
@@ -18,12 +17,13 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import firebase from "../../config/Firebase";
 import ReservedWords from "../../constants/ReservedWords";
+import TermsAndConditions from "../../components/TermsAndConditions";
+import ErrorMessage from "../../components/ErrorMessage";
 
 const logo = require("../../assets/signup.png");
 
-const { height } = Dimensions.get("screen");
-
 const SignUp = ({ navigation }) => {
+  // Screen states
   const [modalVisible, setModalVisible] = useState(true);
 
   const [username, setUsername] = useState("");
@@ -37,6 +37,7 @@ const SignUp = ({ navigation }) => {
 
   const [loading, setLoading] = useState(false);
 
+  // Clears any errors and invalid check states
   const clearErrors = () => {
     setErrorMessage("");
     setUsernameInvalid(false);
@@ -44,6 +45,7 @@ const SignUp = ({ navigation }) => {
     setPasswordInvalid(false);
   };
 
+  // Checks error codes sent by Firebase and sets error message accordingly
   const checkErrorCode = (code) => {
     if (code === "auth/too-many-requests") {
       setErrorMessage("System locked. Try to login after some time.");
@@ -65,54 +67,72 @@ const SignUp = ({ navigation }) => {
     }
   };
 
+  // Handles Sign up logic
   const signUpHandler = () => {
     clearErrors();
 
     setLoading(true);
-    let regex = /((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{6,}))/;
+    let regex = /((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{6,}))/; // Regular expression for password
 
+    // Check email, password and username length
     if (email.length === 0 && password.length === 0 && username.length === 0) {
       setErrorMessage("Fields cannot be left blank");
       setUsernameInvalid(true);
       setEmailInvalid(true);
       setPasswordInvalid(true);
       setLoading(false);
-    } else if (username.length === 0) {
+    }
+    // Check username length
+    else if (username.length === 0) {
       setErrorMessage("Enter a username.");
       setUsernameInvalid(true);
       setLoading(false);
-    } else if (email.length === 0) {
+    }
+    // Check email length
+    else if (email.length === 0) {
       setErrorMessage("Enter your email.");
       setEmailInvalid(true);
       setLoading(false);
-    } else if (password.length === 0) {
+    }
+    // Check password length
+    else if (password.length === 0) {
       setErrorMessage("Enter your password.");
       setPasswordInvalid(true);
       setLoading(false);
-    } else if (!regex.test(password)) {
+    }
+    // Check password using regex
+    else if (!regex.test(password)) {
       setErrorMessage(
         "Password must contain atleast 1 capital, 1 small letter and 1 number and be 6 characters long."
       );
       setPasswordInvalid(true);
       setLoading(false);
     } else if (username.length > 0) {
+      // Check if password matches with any reserve words
       if (!ReservedWords.includes(username.toLocaleLowerCase())) {
+        // Check if username already taken
         firebase
           .firestore()
           .collection("users")
           .where("username", "==", username)
           .get()
           .then((querySnapshot) => {
+            // Username taken
             if (!querySnapshot.empty) {
               setErrorMessage("Username already taken.");
               setUsernameInvalid(true);
               setLoading(false);
-            } else {
+            }
+            // Username valid
+            // Create new user with email and password
+            // If user created, AuthStack is removed and AppStack is loaded (see MainStack)
+            else {
               firebase
                 .auth()
                 .createUserWithEmailAndPassword(email, password)
                 .then(() => {
-                  let userID = firebase.auth().currentUser.uid;
+                  let userID = firebase.auth().currentUser.uid; // Get current user's id
+                  // Create new user document in Firebase firestore and sets details
                   firebase.firestore().collection("users").doc(userID).set({
                     username,
                     posts: [],
@@ -121,8 +141,8 @@ const SignUp = ({ navigation }) => {
                   });
                 })
                 .catch((error) => {
-                  checkErrorCode(error.code);
-                  setLoading(false);
+                  checkErrorCode(error.code); // Display error message using error codes
+                  setLoading(false); // Stops loading
                 });
             }
           });
@@ -138,6 +158,7 @@ const SignUp = ({ navigation }) => {
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      {/* Terms and Conditions Modal */}
       <Modal
         animationType="slide"
         visible={modalVisible}
@@ -149,89 +170,7 @@ const SignUp = ({ navigation }) => {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <ScrollView>
-              <View style={{ flex: 1 }}>
-                <Text
-                  style={{
-                    marginBottom: 15,
-                    textAlign: "center",
-                    color: "purple",
-                    fontWeight: "bold",
-                  }}
-                >
-                  The terms defined below govern your use of Shine Brightly and
-                  its services and functionalities. By using this app, you are
-                  agreeing to abide by these terms.
-                </Text>
-                <Text>For the purposes of this Terms of Use:</Text>
-                <Text>
-                  {"\u2B24"}“We”, “Service” and “Activities” refers to the Shine
-                  Brightly app.
-                  {"\n"}
-                  {"\u2B24"}“You” and “Your” refers to you as the user making
-                  use of the Service. {"\n"}
-                </Text>
-
-                <View>
-                  <Text style={{ fontWeight: "bold" }}>
-                    “Use at Your Own Risk” Disclaimer
-                  </Text>
-                  <Text>
-                    This Service is not meant to be used as an alternative for
-                    medical treatment or advice. All the activities that You
-                    partake in should be done with care. We will not be liable
-                    for any mishaps, illness or damages caused by Your usage of
-                    the Service. If You have any medical queries about
-                    participating in certain Activities, please contact seek
-                    professional medical advice first.{"\n"}
-                  </Text>
-                </View>
-
-                <View>
-                  <Text style={{ fontWeight: "bold" }}>Prohibited Conduct</Text>
-                  <Text>
-                    You agree to use the Service by accepting the rules and
-                    regulations below. Any violation of these rules shall be
-                    fully Your responsibility and can lead to termination of
-                    Your account. By using this Service, you agree not to:
-                    {"\n"}
-                    {"\u2B24"}Exhibit any behaviour such as harassment or
-                    intimidation to other users.{"\n"}
-                    {"\u2B24"}Use the Service in any manner to make it less
-                    pleasant for others such as posting offensive, demeaning
-                    comments on other users’ post.{"\n"}
-                    {"\u2B24"}Attempt to corrupt or crash the Service by
-                    “flooding” it with requests.{"\n"}
-                    {"\u2B24"}Reverse engineer any aspect of the Service for
-                    Your personal gain.{"\n"}
-                  </Text>
-                </View>
-                <View>
-                  <Text style={{ fontWeight: "bold" }}>Privacy Policy</Text>
-                  <Text>
-                    The personal information collected by this Service will be
-                    used to provide You with a better experience. All
-                    information gathered will not be shared with anyone except
-                    by third party services used to identify You:{"\n"}
-                    {"\u2B24"}Facebook{"\n"}
-                    {"\u2B24"}Google Analytics for Firebase{"\n"}
-                    We value Your trust in providing all personal information
-                    required. However, no electronic media is 100% protected and
-                    thus We cannot guarantee its total security.
-                  </Text>
-                </View>
-                <View>
-                  <Text style={{ fontWeight: "bold" }}>Termination</Text>
-                  <Text>
-                    If You fail to abide by the Terms of Use, We have the right
-                    to terminate access to the Service and Your account. We
-                    shall not be held accountable for any harm or loss of
-                    information lead by the termination of Your account.
-                  </Text>
-                </View>
-              </View>
-            </ScrollView>
-
+            <TermsAndConditions />
             <TouchableOpacity
               style={styles.acceptButton}
               onPress={() => {
@@ -245,41 +184,22 @@ const SignUp = ({ navigation }) => {
           </View>
         </View>
       </Modal>
-      <View style={styles.container}>
-        <StatusBar barStyle="light-content"></StatusBar>
 
-        {/* header style */}
-        <View
-          style={{
-            marginTop: -65,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
           <Image source={logo}></Image>
         </View>
-
-        <View
-          style={{
-            position: "absolute",
-            top: 24,
-            width: "100%",
-          }}
-        >
+        <View style={styles.greetingContainer}>
           <Text style={styles.greeting}>{"Hello!\nSign Up here"}</Text>
         </View>
 
-        {/* error msg display */}
-        {errorMessage ? (
-          <View style={styles.errorMsg}>
-            <Text style={styles.error}>{errorMessage}</Text>
-          </View>
-        ) : (
-          <></>
-        )}
+        {/* Error Message */}
+        <ErrorMessage errorMessage={errorMessage} />
 
-        {/* //form code */}
+        {/* Sign Up Form */}
         <View style={styles.form}>
+          {/* Username Input */}
           <TextInput
             onFocus={clearErrors}
             error={usernameInvalid}
@@ -290,6 +210,7 @@ const SignUp = ({ navigation }) => {
             value={username}
             theme={{ colors: { primary: "purple" } }}
           />
+          {/* Email Input */}
           <TextInput
             onFocus={clearErrors}
             error={emailInvalid}
@@ -301,12 +222,8 @@ const SignUp = ({ navigation }) => {
             keyboardType="email-address"
             theme={{ colors: { primary: "purple" } }}
           />
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
+          {/* Password Input */}
+          <View style={styles.passwordContainer}>
             <TextInput
               onFocus={clearErrors}
               error={passwordInvalid}
@@ -318,14 +235,9 @@ const SignUp = ({ navigation }) => {
               value={password.trim()}
               theme={{ colors: { primary: "purple" } }}
             />
-
+            {/* Password visibility toggle */}
             <TouchableOpacity
-              style={{
-                marginLeft: 15,
-                position: "absolute",
-                right: 15,
-                alignSelf: "center",
-              }}
+              style={styles.showPasswordIcon}
               onPress={() => setPasswordVisible(!passwordVisible)}
             >
               <MaterialCommunityIcons
@@ -336,9 +248,10 @@ const SignUp = ({ navigation }) => {
           </View>
         </View>
 
-        {/* //sign up button */}
+        {/* Sign Up Button */}
         <TouchableOpacity style={styles.button} onPress={signUpHandler}>
           <Text style={{ color: "#FFF", fontWeight: "500" }}>
+            {/* Checks if loading; displays spinner if yes else displays Sign Up */}
             {loading ? (
               <ActivityIndicator size="large" color="white" />
             ) : (
@@ -347,7 +260,7 @@ const SignUp = ({ navigation }) => {
           </Text>
         </TouchableOpacity>
 
-        {/* sign in back */}
+        {/* Sign Up text and button */}
         <TouchableOpacity
           style={{ alignSelf: "center", marginTop: 25 }}
           onPress={() => navigation.navigate("Login")}
@@ -369,24 +282,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
   },
+  header: {
+    marginTop: -65,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  greetingContainer: {
+    position: "absolute",
+    top: 24,
+    width: "100%",
+  },
   greeting: {
     marginTop: 15,
     marginBottom: 15,
     color: "#FFF",
     fontSize: 20,
     fontWeight: "400",
-    textAlign: "center",
-  },
-  errorMsg: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginHorizontal: 30,
-    marginVertical: 15,
-  },
-  error: {
-    color: "#E9446A",
-    fontSize: 13,
-    fontWeight: "600",
     textAlign: "center",
   },
   form: {
@@ -403,6 +314,16 @@ const styles = StyleSheet.create({
     color: "#161F3D",
     backgroundColor: "white",
     marginVertical: 5,
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  showPasswordIcon: {
+    marginLeft: 15,
+    position: "absolute",
+    right: 15,
+    alignSelf: "center",
   },
   button: {
     marginHorizontal: 30,
