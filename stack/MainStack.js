@@ -4,9 +4,10 @@ import AuthStack from "./AuthStack";
 import AppStack from "./AppStack/AppStack";
 
 import firebase from "../config/Firebase";
+import SplashScreen from "../screens/SplashScreen";
 
 export default MainStack = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
 
   const MainStack = createStackNavigator();
 
@@ -18,11 +19,15 @@ export default MainStack = () => {
         setIsLoggedIn(false);
       }
     });
+
+    return subscriber;
   }, []);
 
   return (
     <MainStack.Navigator headerMode="none">
-      {isLoggedIn ? (
+      {isLoggedIn === null ? (
+        <MainStack.Screen name="SplashScreen" component={SplashScreen} />
+      ) : isLoggedIn === true ? (
         <MainStack.Screen name="App" component={AppStack} />
       ) : (
         <MainStack.Screen name="Auth" component={AuthStack} />
