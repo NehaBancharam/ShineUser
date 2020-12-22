@@ -14,6 +14,7 @@ import { TextInput } from "react-native-paper";
 import firebase from "../../config/Firebase";
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import ErrorMessage from "../../components/ErrorMessage";
 
 const { height } = Dimensions.get("screen");
 
@@ -29,12 +30,14 @@ const Login = ({ navigation }) => {
 
   const [loading, setLoading] = useState(false);
 
+  // Clears any errors and invalid check states
   const clearErrors = () => {
     setErrorMessage("");
     setPasswordInvalid(false);
     setEmailInvalid(false);
   };
 
+  // Checks error codes sent by Firebase and sets error message accordingly
   const checkErrorCode = (code) => {
     if (code === "auth/too-many-requests") {
       setErrorMessage("System locked. Try to login after some time.");
@@ -52,65 +55,70 @@ const Login = ({ navigation }) => {
     }
   };
 
+  // Handles Sign in logic
   const signInHandler = () => {
     clearErrors();
 
     setLoading(true);
 
+    // Check email and password length
     if (email.length === 0 && password.length === 0) {
       setErrorMessage("Enter your email and password.");
       setEmailInvalid(true);
       setPasswordInvalid(true);
       setLoading(false);
-    } else if (email.length === 0) {
+    }
+    // Check email length
+    else if (email.length === 0) {
       setErrorMessage("Enter your email.");
       setEmailInvalid(true);
       setLoading(false);
-    } else if (password.length === 0) {
+    }
+    // Check password length
+    else if (password.length === 0) {
       setErrorMessage("Enter your password.");
       setPasswordInvalid(true);
       setLoading(false);
-    } else {
+    }
+    // Values properly entered
+    else {
+      // Sign in using Firebase auth()
+      // If successful, AuthStack is removed and AppStack is loaded (see MainStack)
       firebase
         .auth()
-        .signInWithEmailAndPassword(email, password)
-        .then(() => setLoading(false))
+        .signInWithEmailAndPassword(email, password) // Sign user in
+        .then(() => setLoading(false)) // Stops loading
         .catch((error) => {
-          checkErrorCode(error.code);
-          setLoading(false);
+          checkErrorCode(error.code); // Display error message using error codes
+          setLoading(false); // Stops loading
         });
     }
   };
 
+  // Navigate to ForgotPassword screen
   const forgotPassword = () => {
     navigation.navigate("ForgotPassword");
   };
 
+  // Navigate to SignUp screen
+  const signUp = () => {
+    navigation.navigate("SignUp");
+  };
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      {/* Logo Container */}
       <View style={styles.container}>
-        <StatusBar barStyle="light-content"></StatusBar>
-        <View
-          style={{
-            marginTop: 45,
-            marginBottom: 15,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
+        <View style={styles.logoContainer}>
           <Image source={logo}></Image>
         </View>
 
-        {errorMessage ? (
-          <View style={styles.errorMsg}>
-            <Text style={styles.error}>{errorMessage}</Text>
-          </View>
-        ) : (
-          <></>
-        )}
+        {/* Display error message */}
+        <ErrorMessage errorMessage={errorMessage} />
 
-        {/* //form code */}
+        {/* Sign in Form */}
         <View style={styles.form}>
+          {/* Email Input */}
           <TextInput
             onFocus={clearErrors}
             error={emailInvalid}
@@ -122,12 +130,8 @@ const Login = ({ navigation }) => {
             keyboardType="email-address"
             theme={{ colors: { primary: "purple" } }}
           />
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
+          {/* Password Input */}
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <TextInput
               onFocus={clearErrors}
               error={passwordInvalid}
@@ -139,13 +143,9 @@ const Login = ({ navigation }) => {
               value={password.trim()}
               theme={{ colors: { primary: "purple" } }}
             />
+            {/* Password visibility toggle */}
             <TouchableOpacity
-              style={{
-                marginLeft: 15,
-                position: "absolute",
-                right: 15,
-                alignSelf: "center",
-              }}
+              style={styles.showPasswordIcon}
               onPress={() => setPasswordVisible(!passwordVisible)}
             >
               <MaterialCommunityIcons
@@ -154,6 +154,7 @@ const Login = ({ navigation }) => {
               />
             </TouchableOpacity>
           </View>
+          {/* Forgot Password button */}
           <View style={{ flexDirection: "row-reverse" }}>
             <TouchableOpacity onPress={forgotPassword}>
               <Text style={{ fontSize: 13, color: "gray", paddingTop: 5 }}>
@@ -162,9 +163,10 @@ const Login = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
-
+        {/* Sign In Button */}
         <TouchableOpacity style={styles.button} onPress={signInHandler}>
-          <Text style={{ color: "#FFF", fontWeight: "500" }}>
+          <Text style={styles.buttonText}>
+            {/* Checks if loading; displays spinner if yes else displays Sign in */}
             {loading ? (
               <ActivityIndicator size="large" color="white" />
             ) : (
@@ -172,22 +174,11 @@ const Login = ({ navigation }) => {
             )}
           </Text>
         </TouchableOpacity>
-
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "row",
-            paddingVertical: 25,
-          }}
-        >
-          <Text style={{ color: "#414959", fontSize: 13 }}>
-            New to Shine Brightly?{" "}
-          </Text>
-          <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-            <Text style={{ fontSize: 13, fontWeight: "500", color: "#E9446A" }}>
-              Sign Up here
-            </Text>
+        {/* Sign Up text and button */}
+        <View style={styles.signUpTextContainer}>
+          <Text style={styles.signUpText}>New to Shine Brightly? </Text>
+          <TouchableOpacity onPress={signUp}>
+            <Text style={styles.signUpTextMain}>Sign Up here</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -202,18 +193,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
   },
-  errorMsg: {
-    alignItems: "center",
+  logoContainer: {
+    marginTop: 45,
+    marginBottom: 15,
     justifyContent: "center",
-    marginHorizontal: 30,
-    marginVertical: 15,
+    alignItems: "center",
   },
-  error: {
-    color: "#E9446A",
-    fontSize: 13,
-    fontWeight: "600",
-    textAlign: "center",
-  },
+
   form: {
     marginVertical: 15,
     marginHorizontal: 30,
@@ -229,6 +215,12 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     marginVertical: 5,
   },
+  showPasswordIcon: {
+    marginLeft: 15,
+    position: "absolute",
+    right: 15,
+    alignSelf: "center",
+  },
   button: {
     marginHorizontal: 30,
     backgroundColor: "#E9446A",
@@ -236,5 +228,24 @@ const styles = StyleSheet.create({
     height: 52,
     alignItems: "center",
     justifyContent: "center",
+  },
+  buttonText: {
+    color: "#FFF",
+    fontWeight: "bold",
+  },
+  signUpTextContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    paddingVertical: 25,
+  },
+  signUpText: {
+    color: "#414959",
+    fontSize: 13,
+  },
+  signUpTextMain: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: "#E9446A",
   },
 });
