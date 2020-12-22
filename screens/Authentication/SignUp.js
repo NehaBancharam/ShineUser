@@ -137,7 +137,7 @@ const SignUp = ({ navigation }) => {
   };
 
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <Modal
         animationType="slide"
         visible={modalVisible}
@@ -367,7 +367,6 @@ export default SignUp;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    height,
     backgroundColor: "white",
   },
   greeting: {
