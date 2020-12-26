@@ -42,7 +42,7 @@ const OnBoarding = ({ navigation }) => {
       DoneButtonComponent={DoneButton}
       pages={[
         {
-          backgroundColor: "#70ae98",
+          backgroundColor: "#ffffff",
           image: (
             <Image
               source={require("../../assets/onboarding/onb-1.png")}
@@ -53,11 +53,12 @@ const OnBoarding = ({ navigation }) => {
               }}
             />
           ),
-          title: "Onboarding 1",
-          subtitle: "Done with React Native Onboarding Swiper",
+          title: "Welcome to Shine Brightly!",
+          subtitle:
+            "Embark on a journey to enhance the quality of your life by using a holistic approach to self development.",
         },
         {
-          backgroundColor: "#5cbe7a",
+          backgroundColor: "#D55286",
           image: (
             <Image
               source={require("../../assets/onboarding/onb-2.png")}
@@ -69,8 +70,9 @@ const OnBoarding = ({ navigation }) => {
               resizeMode="contain"
             />
           ),
-          title: "Onboarding 2",
-          subtitle: "Done with React Native Onboarding Swiper",
+          title: " Complete monthly tasks.",
+          subtitle:
+            "Each month you will given a list of tasks to complete ranging from self care and physical activities to help both your mental and physical health.",
         },
         {
           backgroundColor: "#e58b88",
@@ -85,8 +87,24 @@ const OnBoarding = ({ navigation }) => {
               resizeMode="contain"
             />
           ),
-          title: "Onboarding 3",
-          subtitle: "Done with React Native Onboarding Swiper",
+          title: "Get out of your comfort zone.",
+          subtitle: "There will also be challenges for you to help you get out of your comfort zone and connect with members of the society.",
+        },
+        {
+          backgroundColor: "#e58b88",
+          image: (
+            <Image
+              source={require("../../assets/onboarding/onb-4.png")}
+              style={{
+                width: "100%",
+                height: 200,
+                resizeMode: "contain",
+              }}
+              resizeMode="contain"
+            />
+          ),
+          title: "Connect with other members.",
+          subtitle: "Share your thoughts and progress with other members of the Shine Brightly family.",
         },
       ]}
     />
