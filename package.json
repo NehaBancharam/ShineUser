@@ -10,6 +10,7 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.13.2",
     "@react-native-community/masked-view": "^0.1.10",
+    "@react-native-community/netinfo": "^5.9.6",
     "@react-native-picker/picker": "^1.9.7",
     "@react-navigation/bottom-tabs": "^5.9.2",
     "@react-navigation/material-bottom-tabs": "^5.3.10",
@@ -21,6 +22,7 @@
     "expo-linear-gradient": "~8.3.0",
     "expo-notifications": "^0.7.2",
     "expo-permissions": "^9.3.0",
+    "expo-speech": "^8.4.0",
     "expo-status-bar": "~1.0.2",
     "firebase": "^7.9.0",
     "moment": "^2.29.1",
