@@ -25,7 +25,7 @@ const InfoModal = ({ visible, onRequestClose, label }) => {
             <View
               style={{
                 borderRadius: 20,
-                backgroundColor: "#634C87",
+                backgroundColor: "#E9446A",
                 margin: 10,
                 paddingVertical: 10,
                 paddingHorizontal: 15,
