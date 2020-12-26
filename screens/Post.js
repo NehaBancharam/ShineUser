@@ -6,20 +6,22 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Image,
-  TextInput,
   ActivityIndicator,
   Dimensions,
   ScrollView,
 } from "react-native";
-import firebase from "../config/Firebase";
-
+import { TextInput } from "react-native-paper";
 import { MaterialIcons } from "@expo/vector-icons";
 import Header from "../components/Header";
+
+import firebase from "../config/Firebase";
+import ErrorMessage from "../components/ErrorMessage";
 
 const { height } = Dimensions.get("screen");
 
 export default Post = ({ navigation }) => {
   const [text, setText] = useState("");
+  const [textInvalid, setTextInvalid] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const [loading, setLoading] = useState(false);
@@ -58,6 +60,7 @@ export default Post = ({ navigation }) => {
           });
         });
     } else {
+      setTextInvalid(true);
       setErrorMessage("Post cannot be left blank");
       setLoading(false);
     }
@@ -82,47 +85,38 @@ export default Post = ({ navigation }) => {
             <ActivityIndicator size="large" color="black" />
           </View>
         ) : (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              source={require("../assets/logo/logo.png")}
-              style={styles.avatar}
-            />
-
-            <View style={styles.errorMsg}>
-              {errorMessage ? (
-                <Text style={styles.error}>{errorMessage}</Text>
-              ) : (
-                <></>
-              )}
+          <View>
+            <View style={{ alignItems: "center", paddingVertical: 15 }}>
+              <Image
+                source={require("../assets/login.png")}
+                style={styles.avatar}
+              />
             </View>
 
-            <View style={{ marginHorizontal: 15, alignItems: "center" }}>
+            <ErrorMessage errorMessage={errorMessage} />
+
+            <View style={{ flex: 1, marginHorizontal: 15, marginTop: 15 }}>
               <TextInput
-                style={{
-                  borderWidth: 1,
-                  borderColor: "#634C87",
-                  marginVertical: 15,
-                  paddingHorizontal: 15,
-                }}
-                multiline={true}
-                textAlign="center"
-                numberOfLines={4}
-                // textAlign="center"
-                placeholder="Share your journey with other Shine Brightly members!"
-                onChangeText={(text) => {
+                onFocus={() => {
                   setErrorMessage("");
-                  setText(text);
+                  setTextInvalid(false);
                 }}
+                error={textInvalid}
+                label="Share your journey with other members!"
+                mode="flat"
+                multiline
+                numberOfLines={5}
+                style={styles.input}
+                onChangeText={(text) => setText(text)}
                 value={text}
+                underlineColor="#F0F7FF"
+                keyboardType="default"
+                theme={{
+                  colors: { primary: "#808080" },
+                }}
               />
               <TouchableOpacity
-                style={styles.photo}
+                style={styles.submitButton}
                 onPress={postSubmitHandler}
               >
                 <View
@@ -130,7 +124,7 @@ export default Post = ({ navigation }) => {
                     justifyContent: "center",
                     alignItems: "center",
                     flexDirection: "row",
-                    backgroundColor: "#634C87",
+                    backgroundColor: "#E9446A",
                     borderRadius: 20,
                     paddingVertical: 5,
                     paddingHorizontal: 10,
@@ -157,6 +151,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
+    paddingBottom: 100,
   },
   header: {
     flexDirection: "row",
@@ -166,6 +161,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#D8D9DB",
     backgroundColor: "white",
+  },
+  input: {
+    fontSize: 15,
+    color: "#161F3D",
+    backgroundColor: "#F0F7FF",
   },
   errorMsg: {
     marginTop: 15,
@@ -183,7 +183,8 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
   },
-  photo: {
+  submitButton: {
+    marginVertical: 15,
     flexDirection: "row",
     justifyContent: "flex-end",
   },
