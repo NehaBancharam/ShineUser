@@ -4,22 +4,20 @@ import {
   Text,
   StyleSheet,
   Image,
-  StatusBar,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
   ActivityIndicator,
 } from "react-native";
 import { TextInput } from "react-native-paper";
 import firebase from "../../config/Firebase";
 
 import { MaterialIcons } from "@expo/vector-icons";
-
-const { height } = Dimensions.get("screen");
+import ErrorMessage from "../../components/ErrorMessage";
 
 const logo = require("../../assets/login.png");
 
 const ForgotPassword = ({ navigation }) => {
+  // Screen states
   const [email, setEmail] = useState("");
   const [emailInvalid, setEmailInvalid] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -27,35 +25,13 @@ const ForgotPassword = ({ navigation }) => {
 
   const [loading, setLoading] = useState(false);
 
+  // Clears any errors and invalid check states
   const clearErrors = () => {
     setErrorMessage("");
     setEmailInvalid(false);
   };
 
-  const resetPasswordHandler = () => {
-    clearErrors();
-
-    setLoading(true);
-
-    if (email.length === 0) {
-      setErrorMessage("Enter your email.");
-      setEmailInvalid(true);
-      setLoading(false);
-    } else {
-      firebase
-        .auth()
-        .sendPasswordResetEmail(email)
-        .then(() => {
-          setLoading(false);
-          setReset(true);
-        })
-        .catch((error) => {
-          errorMessageHandler(error.code);
-          console.log(error.code);
-        });
-    }
-  };
-
+  // Checks error codes sent by Firebase and sets error message and invalid states accordingly
   const errorMessageHandler = (code) => {
     if (code === "auth/too-many-requests") {
       setErrorMessage("Too many requests. Try again later.");
@@ -71,37 +47,49 @@ const ForgotPassword = ({ navigation }) => {
     }
   };
 
+  // Handles Reset password logic
+  const resetPasswordHandler = () => {
+    clearErrors();
+
+    setLoading(true);
+
+    // Check email length
+    if (email.length === 0) {
+      setErrorMessage("Enter your email.");
+      setEmailInvalid(true);
+      setLoading(false);
+    } else {
+      // Send email with reset link
+      firebase
+        .auth()
+        .sendPasswordResetEmail(email)
+        .then(() => {
+          setLoading(false);
+          setReset(true);
+        })
+        .catch((error) => {
+          errorMessageHandler(error.code);
+          console.log(error.code);
+        });
+    }
+  };
+
   return (
-    <ScrollView scrollEnabled>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
-        <View
-          style={{
-            marginTop: 45,
-            marginBottom: 15,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Image
-            source={logo}
-            resizeMode="contain"
-            style={{ width: "60%" }}
-          ></Image>
+        {/* Logo Container */}
+        <View style={styles.logoContainer}>
+          <Image source={logo} resizeMode="contain" style={{ width: "60%" }} />
         </View>
-        <View style={styles.msg}>
-          <Text style={{ textAlign: "center", fontWeight: "bold" }}>
-            An email will be sent to you on the email address provided. You can
-            change your password from there.
+        {/* Message */}
+        <View style={styles.messageContainer}>
+          <Text style={styles.message}>
+            Enter your account's email. An email will be sent to you with a
+            password reset link. You can change your password from there.
           </Text>
         </View>
-
-        {errorMessage ? (
-          <View style={styles.msg}>
-            <Text style={styles.error}>{errorMessage}</Text>
-          </View>
-        ) : (
-          <></>
-        )}
+        {/* Error Message */}
+        <ErrorMessage errorMessage={errorMessage} />
 
         {/* //form code */}
         <View style={styles.form}>
@@ -170,18 +158,27 @@ const ForgotPassword = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    height,
     backgroundColor: "white",
   },
-  form: {
-    marginVertical: 15,
-    marginHorizontal: 30,
+  logoContainer: {
+    marginTop: 45,
+    marginBottom: 15,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  msg: {
+  messageContainer: {
     alignItems: "center",
     justifyContent: "center",
     marginHorizontal: 30,
     marginVertical: 15,
+  },
+  message: {
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+  form: {
+    marginVertical: 15,
+    marginHorizontal: 30,
   },
   error: {
     color: "#E9446A",
