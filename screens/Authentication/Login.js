@@ -104,10 +104,10 @@ const Login = ({ navigation }) => {
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      {/* Logo Container */}
       <View style={styles.container}>
+        {/* Logo Container */}
         <View style={styles.logoContainer}>
-          <Image source={logo}></Image>
+          <Image source={logo} resizeMode='contain' style={{ height: 200 }} />
         </View>
 
         {/* Display error message */}
