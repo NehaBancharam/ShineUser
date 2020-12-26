@@ -104,7 +104,19 @@ export default Profile = ({ navigation }) => {
                 .update({
                   username,
                 })
-                .then(() => {
+                .then(async () => {
+                  if (user.posts.length > 0) {
+                    console.log('waaaaaa')
+                    await user.posts.forEach((post) => {
+                      firebase
+                        .firestore()
+                        .collection("posts")
+                        .doc(post)
+                        .update({
+                          username,
+                        });
+                    });
+                  }
                   modalHandler("Your username has been changed", true);
                   setUsername("");
                   setUsernameInvalid(false);
@@ -372,20 +384,6 @@ export default Profile = ({ navigation }) => {
             <Text>Terms and Conditions</Text>
             <MaterialIcons name="info" size={24} />
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.layout}
-            onPress={() => navigation.navigate("About")}
-          >
-            <Text>About Us</Text>
-          </TouchableOpacity>
-          {/* <View>
-          <TouchableOpacity
-            style={styles.logOut}
-            onPress={() => firebase.auth().signOut()}
-          >
-            <Text style={{ fontSize: 14, color: "#ffffff" }}>Log Out</Text>
-          </TouchableOpacity>
-        </View> */}
           <View style={{ marginVertical: 10 }}>
             <Text
               style={{ color: "#D3D3D3", fontSize: 10, textAlign: "center" }}
