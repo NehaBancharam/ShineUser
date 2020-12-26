@@ -10,10 +10,13 @@ import {
   FlatList,
   Linking,
   ActivityIndicator,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { HelperText } from "react-native-paper";
 import * as Notifications from "expo-notifications";
+
+import * as Speech from "expo-speech";
 
 import { MaterialIcons } from "@expo/vector-icons";
 
@@ -34,6 +37,7 @@ const ViewCategory = ({ navigation, route }) => {
     qr,
   } = route.params;
 
+  const [narrationStarted, setNarrationStarted] = useState(false);
   const [isCompleted, setIsCompleted] = useState(completed);
   const [loading, setLoading] = useState(false);
 
@@ -99,7 +103,7 @@ const ViewCategory = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <Header
-        title={<Text style={{ fontWeight: "500", fontSize: 20 }}>{title}</Text>}
+        title={title}
         left={
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <MaterialIcons name="arrow-back" size={24} color="black" />
@@ -107,12 +111,12 @@ const ViewCategory = ({ navigation, route }) => {
         }
       />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={{ flex: 1, marginHorizontal: 15 }}>
+        <View style={{ flex: 1, marginHorizontal: 15, paddingBottom: 500 }}>
           <View
             style={{
-              flex: 1,
               alignItems: "center",
               justifyContent: "center",
+              height: "50%",
             }}
           >
             <Image
@@ -130,7 +134,11 @@ const ViewCategory = ({ navigation, route }) => {
                 justifyContent: "center",
               }}
             >
-              <Text style={{ marginRight: 5 }}>{name}</Text>
+              <Text
+                style={{ marginRight: 5, fontSize: 20, fontWeight: "bold" }}
+              >
+                {name}
+              </Text>
               {qr ? (
                 <TouchableOpacity
                   onPress={() =>
@@ -143,14 +151,37 @@ const ViewCategory = ({ navigation, route }) => {
                 <></>
               )}
             </View>
-            <Text style={{ marginVertical: 5 }}>{description}</Text>
+            <TouchableWithoutFeedback
+              onPress={() => {
+                if (narrationStarted) {
+                  Speech.stop();
+                  setNarrationStarted(false);
+                } else {
+                  Speech.speak(description, { pitch: 1, rate: 1 });
+                  setNarrationStarted(true);
+                }
+              }}
+            >
+              <Text
+                style={{
+                  marginVertical: 5,
+                  textAlign: "justify",
+                }}
+              >
+                {description}
+              </Text>
+            </TouchableWithoutFeedback>
 
-            <HelperText type="error" visible={!correctQR}>
-              Incorrect QR Code. Are you at the right location?
-            </HelperText>
+            {qr ? (
+              <HelperText type="error" visible={!correctQR}>
+                Incorrect QR Code. Are you at the right location?
+              </HelperText>
+            ) : (
+              <></>
+            )}
             <TouchableOpacity
               style={{
-                backgroundColor: isCompleted ? "#00ad2e" : "#00bf33",
+                backgroundColor: "#E9446A",
                 alignItems: "center",
                 paddingVertical: 10,
                 marginVertical: 15,
@@ -181,7 +212,7 @@ const ViewCategory = ({ navigation, route }) => {
                 borderTopColor: "gray",
               }}
             >
-              <Text>Resources</Text>
+              <Text style={{ fontWeight: "bold" }}>Resources</Text>
               <FlatList
                 horizontal
                 showsHorizontalScrollIndicator={false}
