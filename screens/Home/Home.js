@@ -5,8 +5,9 @@ import {
   StyleSheet,
   ImageBackground,
   ScrollView,
-  Dimensions,
   FlatList,
+  Image,
+  Dimensions,
 } from "react-native";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
@@ -18,6 +19,7 @@ import Header from "../../components/Header";
 import firebase from "../../config/Firebase";
 
 const themeBackground = require("../../assets/home.png");
+const avatar = require("../../assets/avatar.png");
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -50,11 +52,11 @@ const Home = ({ navigation }) => {
       .doc(userID)
       .onSnapshot((doc) => {
         setUser(doc.data());
-        getCategories();
+        getCategories(doc.data().categoriesCompleted);
       });
   };
 
-  const getCategories = () => {
+  const getCategories = (categoriesCompleted) => {
     let date = new Date();
     let year = date.getFullYear().toString();
     let month = date.getMonth().toString();
@@ -65,50 +67,40 @@ const Home = ({ navigation }) => {
       .where("year", "==", year)
       .where("month", "==", month)
       .onSnapshot((querySnapshot) => {
-        setSelfCarePosts([]);
-        setChallengePosts([]);
-        setPhysicalPosts([]);
+        let tempSelfCare = [];
+        let tempChallenge = [];
+        let tempPhysical = [];
+
         querySnapshot.forEach(async (doc) => {
-          let completed;
-          await firebase
-            .firestore()
-            .collection("users")
-            .doc(userID)
-            .get()
-            .then((user) => {
-              completed = user.data().categoriesCompleted.includes(doc.id);
-            });
+          let completed = false;
+
+          if (categoriesCompleted.includes(doc.id)) completed = true;
+
           if (doc.data().category === "selfcare") {
-            setSelfCarePosts((previousPosts) => [
-              ...previousPosts,
-              {
-                id: doc.id,
-                ...doc.data(),
-                completed,
-              },
-            ]);
+            tempSelfCare.push({
+              id: doc.id,
+              ...doc.data(),
+              completed,
+            });
           }
           if (doc.data().category === "challenge") {
-            setChallengePosts((previousPosts) => [
-              ...previousPosts,
-              {
-                id: doc.id,
-                ...doc.data(),
-                completed,
-              },
-            ]);
+            tempChallenge.push({
+              id: doc.id,
+              ...doc.data(),
+              completed,
+            });
           }
           if (doc.data().category === "physical") {
-            setPhysicalPosts((previousPosts) => [
-              ...previousPosts,
-              {
-                id: doc.id,
-                ...doc.data(),
-                completed,
-              },
-            ]);
+            tempPhysical.push({
+              id: doc.id,
+              ...doc.data(),
+              completed,
+            });
           }
         });
+        setSelfCarePosts(tempSelfCare);
+        setChallengePosts(tempChallenge);
+        setPhysicalPosts(tempPhysical);
         setLoading(false);
       });
   };
@@ -144,7 +136,10 @@ const Home = ({ navigation }) => {
     }
   };
 
-  useEffect(() => getUserData(), []);
+  useEffect(() => {
+    const subscriber = getUserData();
+    return subscriber;
+  }, []);
 
   useEffect(() => {
     registerForPushNotificationsAsync();
@@ -171,38 +166,73 @@ const Home = ({ navigation }) => {
     return <Loading label="Loading" />;
   } else {
     return (
-      <View style={styles.container}>
-        <ScrollView scrollEnabled>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={styles.container}>
           {/* header style */}
           <Header
+            style={styles.header}
             left={
-              <Text style={{ fontWeight: "500", fontSize: 20 }}>
-                Hi {user ? user.username : ""}!
-              </Text>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View
+                  style={{
+                    borderRadius: 100,
+                    borderWidth: 1,
+                    borderColor: "#D8D9DB",
+                    backgroundColor: "white",
+                    marginRight: 10,
+                  }}
+                >
+                  <Image
+                    source={avatar}
+                    resizeMode="cover"
+                    style={{ width: 60, height: 60 }}
+                  />
+                </View>
+                <View>
+                  <Text style={{ fontSize: 15, color: "white" }}>Hi</Text>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      color: "white",
+                      fontFamily: "ibarra-italic-bold",
+                    }}
+                  >
+                    {user ? user.username : ""}
+                  </Text>
+                </View>
+              </View>
             }
           />
-
-          <View style={{ height: "20%", padding: 15 }}>
-            <ImageBackground
-              style={styles.img}
-              source={themeBackground}
-              imageStyle={{ borderRadius: 20 }}
+          <View style={{ backgroundColor: "#634C87", height: "20%" }}>
+            <View
+              style={{
+                flex: 1,
+                padding: 15,
+                borderTopLeftRadius: 50,
+                backgroundColor: "white",
+              }}
             >
-              <Text
-                style={{
-                  fontFamily: "ibarra-italic",
-                  color: "#ffffff",
-                  fontSize: 30,
-                  textAlign: "center",
-                }}
+              <ImageBackground
+                style={styles.img}
+                source={themeBackground}
+                imageStyle={{ borderRadius: 20 }}
               >
-                Monthly
-              </Text>
-            </ImageBackground>
+                <Text
+                  style={{
+                    fontFamily: "ibarra-italic",
+                    color: "#ffffff",
+                    fontSize: 30,
+                    textAlign: "center",
+                  }}
+                >
+                  Monthly
+                </Text>
+              </ImageBackground>
+            </View>
           </View>
           <View
             style={{
-              height: 1000,
+              // height: 1000,
               backgroundColor: "white",
               marginHorizontal: 15,
             }}
@@ -211,13 +241,30 @@ const Home = ({ navigation }) => {
               style={{
                 alignItems: "center",
                 justifyContent: "center",
-                paddingVertical: 15,
+                paddingTop: 15,
               }}
             >
-              <Text>Tasks To Complete</Text>
+              <Text style={{ fontSize: 17, fontWeight: "bold" }}>
+                Tasks To Complete
+              </Text>
+            </View>
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                marginTop: 5,
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "#300016",
+                  padding: 1,
+                  width: Dimensions.get("screen").width - 225,
+                }}
+              ></View>
             </View>
             <View>
-              <Text style={{ paddingVertical: 15 }}>Self Care</Text>
+              <Text style={styles.taskText}>Self Care</Text>
               <FlatList
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -233,7 +280,7 @@ const Home = ({ navigation }) => {
               />
             </View>
             <View>
-              <Text style={{ paddingVertical: 15 }}>Challenge</Text>
+              <Text style={styles.taskText}>Challenge</Text>
               <FlatList
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -249,7 +296,7 @@ const Home = ({ navigation }) => {
               />
             </View>
             <View>
-              <Text style={{ paddingVertical: 15 }}>Physical</Text>
+              <Text style={styles.taskText}>Physical</Text>
               <FlatList
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -265,8 +312,8 @@ const Home = ({ navigation }) => {
               />
             </View>
           </View>
-        </ScrollView>
-      </View>
+        </View>
+      </ScrollView>
     );
   }
 };
@@ -277,12 +324,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
+    paddingBottom: 100,
   },
   header: {
-    flexDirection: "row",
-    padding: 15,
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#D8D9DB",
+    borderBottomWidth: 0,
+    backgroundColor: "#634C87",
+    borderBottomRightRadius: 50,
   },
   imgText: {
     flexDirection: "row",
@@ -293,5 +340,9 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
     justifyContent: "center",
     elevation: 5,
+  },
+  taskText: {
+    paddingVertical: 15,
+    fontWeight: "bold",
   },
 });
