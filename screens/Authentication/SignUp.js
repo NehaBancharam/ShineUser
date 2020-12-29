@@ -188,7 +188,7 @@ const SignUp = ({ navigation }) => {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <Image source={logo}></Image>
+          <Image source={logo} />
         </View>
         <View style={styles.greetingContainer}>
           <Text style={styles.greeting}>{"Hello!\nSign Up here"}</Text>
