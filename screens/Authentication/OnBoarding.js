@@ -42,7 +42,7 @@ const OnBoarding = ({ navigation }) => {
       DoneButtonComponent={DoneButton}
       pages={[
         {
-          backgroundColor: "#ffffff",
+          backgroundColor: "#E083A3",
           image: (
             <Image
               source={require("../../assets/onboarding/onb-1.png")}
@@ -58,7 +58,7 @@ const OnBoarding = ({ navigation }) => {
             "Embark on a journey to enhance the quality of your life by using a holistic approach to self development.",
         },
         {
-          backgroundColor: "#D55286",
+          backgroundColor: "#6C3654",
           image: (
             <Image
               source={require("../../assets/onboarding/onb-2.png")}
@@ -75,7 +75,7 @@ const OnBoarding = ({ navigation }) => {
             "Each month you will given a list of tasks to complete ranging from self care and physical activities to help both your mental and physical health.",
         },
         {
-          backgroundColor: "#e58b88",
+          backgroundColor: "#70BEC1",
           image: (
             <Image
               source={require("../../assets/onboarding/onb-3.png")}
