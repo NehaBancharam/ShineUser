@@ -16,6 +16,7 @@ import Header from "../components/Header";
 
 import firebase from "../config/Firebase";
 import ErrorMessage from "../components/ErrorMessage";
+import Loading from "../components/Loading";
 
 const { height } = Dimensions.get("screen");
 
@@ -79,11 +80,7 @@ export default Post = ({ navigation }) => {
           }
         />
         {loading ? (
-          <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-          >
-            <ActivityIndicator size="large" color="black" />
-          </View>
+          <Loading label="Posting..." />
         ) : (
           <View>
             <View style={{ alignItems: "center", paddingVertical: 15 }}>
