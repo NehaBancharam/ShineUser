@@ -221,6 +221,7 @@ export default Feed = ({ navigation }) => {
                         refreshing={loading}
                         onRefresh={() => {
                           getPostsHandler();
+                          getUserPostsHandler();
                         }}
                       />
                     }
@@ -249,6 +250,7 @@ export default Feed = ({ navigation }) => {
                   progressBackgroundColor="white"
                   refreshing={loading}
                   onRefresh={() => {
+                    getPostsHandler();
                     getUserPostsHandler();
                   }}
                 />
