@@ -106,7 +106,6 @@ export default Profile = ({ navigation }) => {
                 })
                 .then(async () => {
                   if (user.posts.length > 0) {
-                    console.log('waaaaaa')
                     await user.posts.forEach((post) => {
                       firebase
                         .firestore()
@@ -238,11 +237,7 @@ export default Profile = ({ navigation }) => {
                 <></>
               )}
               <List.AccordionGroup>
-                <List.Accordion
-                  title="Edit Username"
-                  id="1"
-                  onPress={() => console.log("pj")}
-                >
+                <List.Accordion title="Edit Username" id="1">
                   <View style={{ marginHorizontal: 15 }}>
                     <Text style={{ textAlign: "center" }}>
                       Changes to your username will be effected immediately.
@@ -375,20 +370,24 @@ export default Profile = ({ navigation }) => {
             onPress={() => navigation.navigate("Feedback")}
           >
             <Text>Give us a feedback</Text>
-            <MaterialIcons name="feedback" size={30} />
+            <MaterialIcons
+              name="feedback"
+              size={24}
+              style={{ marginLeft: 5 }}
+            />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.layout}
             onPress={() => navigation.navigate("Terms and Conditions")}
           >
             <Text>Terms and Conditions</Text>
-            <MaterialIcons name="info" size={24} />
+            <MaterialIcons name="info" size={24} style={{ marginLeft: 5 }} />
           </TouchableOpacity>
           <View style={{ marginVertical: 10 }}>
             <Text
               style={{ color: "#D3D3D3", fontSize: 10, textAlign: "center" }}
             >
-              © Copyright 2021 All Rights Reserved
+              © Copyright Shine 2021 All Rights Reserved
             </Text>
           </View>
         </View>
