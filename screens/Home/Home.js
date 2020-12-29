@@ -18,7 +18,7 @@ import Header from "../../components/Header";
 
 import firebase from "../../config/Firebase";
 
-const themeBackground = require("../../assets/home.png");
+const themeBackground = require("../../assets/theme-bg.jpg");
 const avatar = require("../../assets/avatar.png");
 
 Notifications.setNotificationHandler({
@@ -31,6 +31,7 @@ Notifications.setNotificationHandler({
 
 const Home = ({ navigation }) => {
   const [user, setUser] = useState({});
+  const [monthlyTheme, setMonthlyTheme] = useState(null);
   const [selfCarePosts, setSelfCarePosts] = useState([]);
   const [challengePosts, setChallengePosts] = useState([]);
   const [physicalPosts, setPhysicalPosts] = useState([]);
@@ -63,45 +64,58 @@ const Home = ({ navigation }) => {
 
     firebase
       .firestore()
-      .collection("categories")
+      .collection("monthlyTheme")
       .where("year", "==", year)
       .where("month", "==", month)
       .onSnapshot((querySnapshot) => {
-        let tempSelfCare = [];
-        let tempChallenge = [];
-        let tempPhysical = [];
-
-        querySnapshot.forEach(async (doc) => {
-          let completed = false;
-
-          if (categoriesCompleted.includes(doc.id)) completed = true;
-
-          if (doc.data().category === "selfcare") {
-            tempSelfCare.push({
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach((doc) => {
+            setMonthlyTheme({
               id: doc.id,
               ...doc.data(),
-              completed,
             });
-          }
-          if (doc.data().category === "challenge") {
-            tempChallenge.push({
-              id: doc.id,
-              ...doc.data(),
-              completed,
-            });
-          }
-          if (doc.data().category === "physical") {
-            tempPhysical.push({
-              id: doc.id,
-              ...doc.data(),
-              completed,
-            });
-          }
-        });
-        setSelfCarePosts(tempSelfCare);
-        setChallengePosts(tempChallenge);
-        setPhysicalPosts(tempPhysical);
-        setLoading(false);
+            firebase
+              .firestore()
+              .collection("categories")
+              .where("monthlyThemeId", "==", doc.id)
+              .onSnapshot((querySnapshot) => {
+                let tempSelfCare = [];
+                let tempChallenge = [];
+                let tempPhysical = [];
+
+                querySnapshot.forEach(async (doc) => {
+                  let completed = false;
+
+                  if (categoriesCompleted.includes(doc.id)) completed = true;
+                  if (doc.data().category === "selfcare") {
+                    tempSelfCare.push({
+                      id: doc.id,
+                      ...doc.data(),
+                      completed,
+                    });
+                  }
+                  if (doc.data().category === "challenge") {
+                    tempChallenge.push({
+                      id: doc.id,
+                      ...doc.data(),
+                      completed,
+                    });
+                  }
+                  if (doc.data().category === "physical") {
+                    tempPhysical.push({
+                      id: doc.id,
+                      ...doc.data(),
+                      completed,
+                    });
+                  }
+                });
+                setSelfCarePosts(tempSelfCare);
+                setChallengePosts(tempChallenge);
+                setPhysicalPosts(tempPhysical);
+                setLoading(false);
+              });
+          });
+        }
       });
   };
 
@@ -203,7 +217,12 @@ const Home = ({ navigation }) => {
               </View>
             }
           />
-          <View style={{ backgroundColor: "#634C87", height: "20%" }}>
+          <View
+            style={{
+              backgroundColor: "#634C87",
+              height: Dimensions.get("screen").height / 4,
+            }}
+          >
             <View
               style={{
                 flex: 1,
@@ -217,16 +236,25 @@ const Home = ({ navigation }) => {
                 source={themeBackground}
                 imageStyle={{ borderRadius: 20 }}
               >
-                <Text
+                <View
                   style={{
-                    fontFamily: "ibarra-italic",
-                    color: "#ffffff",
-                    fontSize: 30,
-                    textAlign: "center",
+                    backgroundColor: "rgba(0, 0, 0, 0.15)",
+                    flex: 1,
+                    justifyContent: "center",
+                    borderRadius: 20,
                   }}
                 >
-                  Monthly
-                </Text>
+                  <Text
+                    style={{
+                      fontFamily: "ibarra-italic-bold",
+                      color: "#ffffff",
+                      fontSize: 30,
+                      textAlign: "center",
+                    }}
+                  >
+                    {monthlyTheme ? monthlyTheme.title : ""}
+                  </Text>
+                </View>
               </ImageBackground>
             </View>
           </View>
@@ -324,7 +352,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    paddingBottom: 100,
+    paddingBottom: 150,
   },
   header: {
     borderBottomWidth: 0,
@@ -339,7 +367,6 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: "cover",
     justifyContent: "center",
-    elevation: 5,
   },
   taskText: {
     paddingVertical: 15,
