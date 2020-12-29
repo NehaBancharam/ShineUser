@@ -31,7 +31,7 @@ const ViewCategory = ({ navigation, route }) => {
     title,
     name,
     description,
-    imageUrl,
+    image,
     resources,
     completed,
     qr,
@@ -111,16 +111,15 @@ const ViewCategory = ({ navigation, route }) => {
         }
       />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={{ flex: 1, marginHorizontal: 15, paddingBottom: 500 }}>
+        <View style={{ flex: 1, marginHorizontal: 15, paddingBottom: 100 }}>
           <View
             style={{
-              alignItems: "center",
-              justifyContent: "center",
-              height: "50%",
+              width: "100%",
+              height: Dimensions.get("screen").height / 2.5,
             }}
           >
             <Image
-              source={{ uri: imageUrl }}
+              source={{ uri: image.imageUrl }}
               resizeMode="contain"
               style={{ width: "100%", height: "100%" }}
             />
