@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  Dimensions,
 } from "react-native";
 import { TextInput } from "react-native-paper";
 import firebase from "../../config/Firebase";
@@ -107,7 +108,14 @@ const Login = ({ navigation }) => {
       <View style={styles.container}>
         {/* Logo Container */}
         <View style={styles.logoContainer}>
-          <Image source={logo} resizeMode="contain" style={{ width: "60%" }} />
+          <Image
+            source={logo}
+            resizeMode="contain"
+            style={{
+              width: "100%",
+              height: Dimensions.get("screen").height / 3,
+            }}
+          />
         </View>
 
         {/* Display error message */}
