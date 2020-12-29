@@ -5,7 +5,7 @@ const splashScreen = require("../assets/splash-screen.png");
 const SplashScreen = (props) => {
   return (
     <View style={styles.container}>
-      <View style={{ flex: 1, margin: 15 }}>
+      <View style={{ flex: 1 }}>
         <Image
           source={splashScreen}
           resizeMode="center"
