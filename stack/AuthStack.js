@@ -35,7 +35,7 @@ export default AuthStack = () => {
         cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
       }}
     >
-      {isFirstLaunch === null ? (
+      {/* {isFirstLaunch === null ? (
         <AuthStack.Screen name="SplashScreen" component={SplashScreen} />
       ) : (
         <>
@@ -48,7 +48,8 @@ export default AuthStack = () => {
           <AuthStack.Screen name="SignUp" component={SignUp} />
           <AuthStack.Screen name="ForgotPassword" component={ForgotPassword} />
         </>
-      )}
+      )} */}
+      <AuthStack.Screen name="OnBoarding" component={OnBoarding} />
     </AuthStack.Navigator>
   );
 };
