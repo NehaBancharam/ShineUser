@@ -107,7 +107,7 @@ const Login = ({ navigation }) => {
       <View style={styles.container}>
         {/* Logo Container */}
         <View style={styles.logoContainer}>
-          <Image source={logo} resizeMode='contain' style={{ height: 200 }} />
+          <Image source={logo} resizeMode="contain" style={{ width: "60%" }} />
         </View>
 
         {/* Display error message */}
