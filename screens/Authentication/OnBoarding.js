@@ -58,7 +58,7 @@ const OnBoarding = ({ navigation }) => {
             "Embark on a journey to enhance the quality of your life by using a holistic approach to self development.",
         },
         {
-          backgroundColor: "#6C3654",
+          backgroundColor: "#F4A943",
           image: (
             <Image
               source={require("../../assets/onboarding/onb-2.png")}
