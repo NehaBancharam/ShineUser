@@ -20,7 +20,7 @@ const OnBoarding = ({ navigation }) => {
       }}
       {...props}
     >
-      <Text style={{ color: "white", fontSize: 15 }}>Done</Text>
+      <Text style={{ color: "white", fontSize: 15 }}>Next</Text>
       <MaterialIcons name="navigate-next" size={24} color="white" />
     </TouchableOpacity>
   );
@@ -88,7 +88,8 @@ const OnBoarding = ({ navigation }) => {
             />
           ),
           title: "Get out of your comfort zone.",
-          subtitle: "There will also be challenges for you to help you get out of your comfort zone and connect with members of the society.",
+          subtitle:
+            "There will also be challenges for you to help you get out of your comfort zone and connect with members of the society.",
         },
         {
           backgroundColor: "#e58b88",
@@ -104,7 +105,8 @@ const OnBoarding = ({ navigation }) => {
             />
           ),
           title: "Connect with other members.",
-          subtitle: "Share your thoughts and progress with other members of the Shine Brightly family.",
+          subtitle:
+            "Share your thoughts and progress with other members of the Shine Brightly family.",
         },
       ]}
     />
