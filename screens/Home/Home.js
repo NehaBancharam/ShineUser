@@ -53,11 +53,11 @@ const Home = ({ navigation }) => {
       .doc(userID)
       .onSnapshot((doc) => {
         setUser(doc.data());
-        getCategories(doc.data().categoriesCompleted);
+        getMonthlyTheme(doc.data().categoriesCompleted);
       });
   };
 
-  const getCategories = (categoriesCompleted) => {
+  const getMonthlyTheme = (categoriesCompleted) => {
     let date = new Date();
     let year = date.getFullYear().toString();
     let month = date.getMonth().toString();
