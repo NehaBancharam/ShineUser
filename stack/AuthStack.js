@@ -11,7 +11,7 @@ import OnBoarding from "../screens/Authentication/OnBoarding";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SplashScreen from "../screens/SplashScreen";
 
-export default AuthStack = () => {
+const AuthStack = () => {
   const AuthStack = createStackNavigator();
   const [isFirstLaunch, setIsFirstLaunch] = useState(null);
 
@@ -20,10 +20,8 @@ export default AuthStack = () => {
       if (value === null) {
         AsyncStorage.setItem("alreadyLaunched", "true");
         setIsFirstLaunch(true);
-        console.log("first launch");
       } else {
         setIsFirstLaunch(false);
-        console.log("NOT first launch");
       }
     });
   }, []);
@@ -52,3 +50,4 @@ export default AuthStack = () => {
     </AuthStack.Navigator>
   );
 };
+export default AuthStack;

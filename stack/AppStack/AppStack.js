@@ -47,7 +47,7 @@ const screenOptions = ({ route }) => ({
   },
 });
 
-export default BottomTabNavigator = () => {
+const BottomTabNavigator = () => {
   return (
     <Tab.Navigator screenOptions={screenOptions} barStyle={barStyle} shifting>
       <Tab.Screen name="Home" component={HomeStack} />
@@ -56,3 +56,5 @@ export default BottomTabNavigator = () => {
     </Tab.Navigator>
   );
 };
+
+export default BottomTabNavigator;
