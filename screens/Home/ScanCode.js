@@ -17,7 +17,7 @@ const ScanCode = ({ navigation, route }) => {
     })();
   }, []);
 
-  const handleBarCodeScanned = ({ type, data }) => {
+  const handleBarCodeScanned = ({ data }) => {
     setScanned(true);
     if (data === qr) {
       navigation.goBack();
