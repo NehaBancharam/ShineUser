@@ -148,7 +148,7 @@ const SignUp = ({ navigation }) => {
           });
       } else {
         setErrorMessage(
-          "Username not valid. Please choose another one. Thank you very much, Hallelujah, Hail Jesussss"
+          "Username not valid. Please choose another one."
         );
         setUsernameInvalid(true);
         setLoading(false);
