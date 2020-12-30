@@ -54,13 +54,11 @@ const ViewCategory = ({ navigation, route }) => {
     navigation.navigate("ScanCode", { qr, handleQRScan });
   };
 
-  const handleQRScan = (completed) => {
-    if (completed) {
+  const handleQRScan = (successful) => {
+    if (successful) {
       completeActivity();
-      console.log("Completed");
       setCorrectQR(true);
     } else {
-      console.log("Nope");
       setCorrectQR(false);
     }
   };
@@ -91,7 +89,7 @@ const ViewCategory = ({ navigation, route }) => {
                 color: "#11ffed00",
               },
               trigger: {
-                seconds: 5,
+                seconds: 2,
               },
             });
             setIsCompleted(true);
