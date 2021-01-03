@@ -6,19 +6,21 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   ScrollView,
-  Modal,
+  Share,
 } from "react-native";
 import { List, TextInput } from "react-native-paper";
+import Header from "../../components/Header";
+import UserCard from "../../components/profile/UserCard";
+import ReservedWords from "../../constants/ReservedWords";
+import InfoModal from "../../components/profile/InfoModal";
+
 import {
   MaterialIcons,
   MaterialCommunityIcons,
   AntDesign,
 } from "@expo/vector-icons";
-import Header from "../../components/Header";
+
 import firebase from "../../config/Firebase";
-import UserCard from "../../components/profile/UserCard";
-import ReservedWords from "../../constants/ReservedWords";
-import InfoModal from "../../components/profile/InfoModal";
 
 export default Profile = ({ navigation }) => {
   const userID = firebase.auth().currentUser.uid;
@@ -26,6 +28,8 @@ export default Profile = ({ navigation }) => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalText, setModalText] = useState("");
+
+  const [appShareLink, setAppShareLink] = useState("");
 
   const [username, setUsername] = useState("");
   const [usernameInvalid, setUsernameInvalid] = useState(false);
@@ -195,7 +199,27 @@ export default Profile = ({ navigation }) => {
     }
   };
 
+  const getAppShareLinkHandler = () => {
+    firebase
+      .firestore()
+      .collection("resources")
+      .doc("app-share-link")
+      .get()
+      .then((doc) => setAppShareLink(doc.data().url));
+  };
+
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message: `Shine Brightly 🌟\nTake control of your mental health.\nDownload At: ${appShareLink}`,
+      });
+    } catch (error) {
+      console(error.message);
+    }
+  };
+
   useEffect(() => getUserData(), []);
+  useEffect(() => getAppShareLinkHandler(), []);
 
   return (
     <View style={styles.container}>
@@ -365,6 +389,10 @@ export default Profile = ({ navigation }) => {
             justifyContent: "flex-end",
           }}
         >
+          <TouchableOpacity style={styles.layout} onPress={onShare}>
+            <Text>Share the app</Text>
+            <MaterialIcons name="share" size={24} style={{ marginLeft: 5 }} />
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.layout}
             onPress={() => navigation.navigate("Feedback")}
