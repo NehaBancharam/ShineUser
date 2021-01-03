@@ -7,6 +7,7 @@ import {
   FlatList,
   RefreshControl,
   Image,
+  Keyboard,
 } from "react-native";
 import { FAB, Searchbar } from "react-native-paper";
 import PostCard from "../components/feed/PostCard";
@@ -36,54 +37,62 @@ export default Feed = ({ navigation }) => {
 
   const userID = firebase.auth().currentUser.uid;
 
-  const getPostsHandler = (query) => {
+  const getPostsFromSearchHandler = async (query) => {
+    const searchResult = [];
+
+    if (query.length > 0) {
+      await firebase
+        .firestore()
+        .collection("posts")
+        .orderBy("timestamp", "desc")
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach(function (postDoc) {
+            if (postDoc.data().username.includes(query)) {
+              searchResult.push({
+                id: postDoc.id,
+                ...postDoc.data(),
+              });
+            }
+          });
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.log(error);
+          setLoading(false);
+        });
+
+      setPosts(searchResult);
+    } else {
+      Keyboard.dismiss();
+      getPostsHandler();
+    }
+  };
+
+  const getPostsHandler = () => {
     setLoading(true);
 
-    if (query) {
-      firebase
-        .firestore()
-        .collection("posts")
-        .where("username", "==", query)
-        .orderBy("timestamp", "desc")
-        .get()
-        .then((querySnapshot) => {
-          let tempPosts = [];
-          querySnapshot.forEach(function (postDoc) {
-            tempPosts.push({
-              id: postDoc.id,
-              ...postDoc.data(),
-            });
+    firebase
+      .firestore()
+      .collection("posts")
+      .orderBy("timestamp", "desc")
+      .limit(10)
+      .get()
+      .then((querySnapshot) => {
+        let tempPosts = [];
+        querySnapshot.forEach(function (postDoc) {
+          tempPosts.push({
+            id: postDoc.id,
+            ...postDoc.data(),
           });
-          setPosts(tempPosts);
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.log(error);
-          setLoading(false);
         });
-    } else {
-      firebase
-        .firestore()
-        .collection("posts")
-        .orderBy("timestamp", "desc")
-        .limit(10)
-        .get()
-        .then((querySnapshot) => {
-          let tempPosts = [];
-          querySnapshot.forEach(function (postDoc) {
-            tempPosts.push({
-              id: postDoc.id,
-              ...postDoc.data(),
-            });
-          });
-          setPosts(tempPosts);
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.log(error);
-          setLoading(false);
-        });
-    }
+        setPosts(tempPosts);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        setLoading(false);
+      });
   };
 
   const getUserPostsHandler = () => {
@@ -194,7 +203,7 @@ export default Feed = ({ navigation }) => {
           <>
             <Searchbar
               placeholder="Search Username"
-              onChangeText={(search) => getPostsHandler(search)}
+              onChangeText={(search) => getPostsFromSearchHandler(search)}
               style={{ margin: 15, borderRadius: 20, fontSize: 10 }}
             />
             {posts.length > 0 ? (
