@@ -117,7 +117,7 @@ const ForgotPassword = ({ navigation }) => {
         <TouchableOpacity
           style={{
             ...styles.button,
-            backgroundColor: reset ? "#00bf33" : "#E9446A",
+            backgroundColor: "#E9446A",
           }}
           onPress={
             reset ? () => navigation.navigate("Login") : resetPasswordHandler
