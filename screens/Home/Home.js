@@ -292,7 +292,7 @@ const Home = ({ navigation }) => {
               ></View>
             </View>
             <View>
-              <Text style={styles.taskText}>Self Care</Text>
+              <Text style={styles.taskText}>Me time</Text>
               <FlatList
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -308,7 +308,7 @@ const Home = ({ navigation }) => {
               />
             </View>
             <View>
-              <Text style={styles.taskText}>Challenge</Text>
+              <Text style={styles.taskText}>Challenge Youself!</Text>
               <FlatList
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -324,7 +324,7 @@ const Home = ({ navigation }) => {
               />
             </View>
             <View>
-              <Text style={styles.taskText}>Physical</Text>
+              <Text style={styles.taskText}>Let's get moving!</Text>
               <FlatList
                 horizontal
                 showsHorizontalScrollIndicator={false}
