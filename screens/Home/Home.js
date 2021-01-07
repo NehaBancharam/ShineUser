@@ -308,7 +308,7 @@ const Home = ({ navigation }) => {
               />
             </View>
             <View>
-              <Text style={styles.taskText}>Challenge Youself!</Text>
+              <Text style={styles.taskText}>Challenge Yourself!</Text>
               <FlatList
                 horizontal
                 showsHorizontalScrollIndicator={false}
